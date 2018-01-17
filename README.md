@@ -45,7 +45,7 @@ For example:
     "moment": "^2.19.2",
     "request": "*",
     "request-promise-native": "*",
-    "al-collector-js": "@alertlogic/al-collector-js"
+    "al-collector-js": "git://github.com/alertlogic/al-collector-js#master"
   },
   "author": "Alert Logic Inc."
 }
