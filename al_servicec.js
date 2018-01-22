@@ -65,7 +65,7 @@ class AimsC extends m_alUtil.RestServiceClient {
         var filename = this._tokenCacheFile;
         fs.readFile(filename, (readError, fileContent) => {
             if (readError) {
-                if ( readError.code != 'ENOENT' ) {
+                if ( readError.code !== 'ENOENT' ) {
                     fs.unlinkSync(filename);
                 }
                 return false;

@@ -9,10 +9,6 @@
     "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura mocha --colors --reporter mocha-jenkins-reporter"
   },
   "devDependencies": {
-    "aws-sdk": "*",
-    "aws-sdk-mock": "*",
-    "dotenv": "*",
-    "clone": "*",
     "jshint": "^2.9.5",
     "mocha": "^3.5.3",
     "mocha-jenkins-reporter": "^0.3.10",

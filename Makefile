@@ -1,4 +1,4 @@
-.PHONY: test cfn
+.PHONY: test 
 
 all: test 
 
