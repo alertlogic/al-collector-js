@@ -9,9 +9,11 @@ Alert Logic cloud collector common library.
 
 This repository contains the common JavaScript functions used by Node.js collectors in the cloud.  
 
-# HOWTO use this library in an AWS Lambda function
+# HOWTO consume this library in Node.js
 
-Create a `package.json` file for [npm](https://www.npmjs.com/) 2.7.0 (or greater) in the root of your AWS Lambda function Node.js root directory.  Include this repo in the `dependencies` and `devDependencies` section as required.  
+Create a `package.json` file for [npm](https://www.npmjs.com/) 2.7.0 (or greater) 
+in the root of your Node.js directory.  Include this repo in the 
+`dependencies` and `devDependencies` section as required.  
 
 For example:
 
@@ -28,8 +30,6 @@ For example:
     "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura mocha --colors --reporter mocha-jenkins-reporter"
   },
   "devDependencies": {
-    "aws-sdk": "*",
-    "aws-sdk-mock": "*",
     "dotenv": "*",
     "clone": "*",
     "jshint": "^2.9.5",
@@ -41,7 +41,6 @@ For example:
   },
   "dependencies": {
     "async": "*",
-    "cfn-response": "*",
     "moment": "^2.19.2",
     "request": "*",
     "request-promise-native": "*",
