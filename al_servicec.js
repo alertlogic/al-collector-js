@@ -8,6 +8,7 @@
  * -----------------------------------------------------------------------------
  */
 
+const debug = require('debug') ('al_servicec');
 const fs = require('fs');
 const path = require('path');
 const m_alUtil = require('./al_util');
@@ -126,6 +127,7 @@ class AlServiceC extends m_alUtil.RestServiceClient {
                                      {};
                 newOptions.headers['x-aims-auth-token'] = resp.authentication.token;
                 var url = '/' + this._aimsc.cid + path;
+                debug(`DEBUG0001: request - method: ${method} path: ${url}`);              
                 return super.request(method, url, newOptions);
             });
     }

@@ -17,6 +17,7 @@
     "sinon": "^3.3.0"
   },
   "dependencies": {
+    "debug": "*",
     "async": "*",
     "moment": "^2.19.2",
     "request": "*",

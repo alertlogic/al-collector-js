@@ -50,6 +50,23 @@ For example:
 }
 ```
 
+# Debugging
+
+To get a debug trace, set an Node.js environment variable called DEBUG and
+specify the JavaScript module/s to debug.
+
+E.g.
+
+```
+export DEBUG=*
+export DEBUG=index
+```
+
+Or set an environment variable called "DEBUG" in your AWS stack (using the AWS 
+console) for the "alertlogic-cwe-collector" AWS Lambda function, with 
+value "index" or "*".
+
+See [debug](https://www.npmjs.com/package/debug) for further details.
 
 # Known Issues/ Open Questions
 
