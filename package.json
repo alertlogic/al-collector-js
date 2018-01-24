@@ -1,0 +1,27 @@
+{
+  "name": "al-collector-js",
+  "version": "1.0.0",
+  "description": "Alert Logic Collector Common Library",
+  "repository": {},
+  "private": true,
+  "scripts": {
+    "lint": "jshint --exclude \"./node_modules/*\" **/*.js",
+    "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura mocha --colors --reporter mocha-jenkins-reporter"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.5",
+    "mocha": "^3.5.3",
+    "mocha-jenkins-reporter": "^0.3.10",
+    "nyc": "^11.3.0",
+    "rewire": "^2.5.2",
+    "sinon": "^3.3.0"
+  },
+  "dependencies": {
+    "debug": "*",
+    "async": "*",
+    "moment": "^2.19.2",
+    "request": "*",
+    "request-promise-native": "*"
+  },
+  "author": "Alert Logic Inc."
+}
