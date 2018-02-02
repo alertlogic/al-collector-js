@@ -163,6 +163,20 @@ class IngestC extends AlServiceC {
         };
         return this.post(`/data/secmsgs`, payload);
     }
+
+    sendVpcFlow(data) {
+        let payload = {
+            json : false,
+            headers : {
+                'Content-Type': 'alertlogic.com/cwl-json',
+                'x-invoked-by' : 'lambda_function',
+                'Content-Encoding' : 'deflate',
+                'Content-Length' : Buffer.byteLength(data)
+            },
+            body : data
+        };
+        return this.post(`/data/vpcflow`, payload);
+    }
 }
 
 
