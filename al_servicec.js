@@ -210,11 +210,10 @@ class AzcollectC extends AlServiceC {
     }
 
     doRegistration(registrationValues) {
-       let statusBody = {
+       let statusBody = Object.assign({
             cf_stack_name : registrationValues.stackName,
-            version : registrationValues.version,
-            collect_rule: registrationValues.collectRule
-        };
+            version : registrationValues.version
+        }, registrationValues.custom_fields);
         var functionName = encodeURIComponent(registrationValues.functionName);
         return this.post(`/aws/${registrationValues.collectorType}/` +
             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: statusBody});
