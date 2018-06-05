@@ -29,9 +29,9 @@ const COLLECTOR_TYPES = {
  *
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname
- * @param {Object} aisCreds - Alert Logic API credentials.
- * @param {string} [aisCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {Object} aimsCreds - Alert Logic API credentials.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  *
  */
 class AimsC extends m_alUtil.RestServiceClient {
@@ -149,9 +149,9 @@ class AlServiceC extends m_alUtil.RestServiceClient {
  *
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname.
- * @param {Object} aisCreds - Alert Logic API credentials object, refer to AimsC.
- * @param {string} [aisCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  *
  */
 class IngestC extends AlServiceC {
@@ -211,8 +211,8 @@ class IngestC extends AlServiceC {
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname
  * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
- * @param {string} [aisCreds.access_key_id] - Aert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {string} [aimsCreds.access_key_id] - Aert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  * @param {string} collectorType - Al collector type: cwl, cwe, o365 etc
  *
  */
@@ -339,8 +339,8 @@ class AzcollectC extends AlServiceC {
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname.
  * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
- * @param {string} [aisCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  *
  */
 class EndpointsC extends AlServiceC {
