@@ -7,6 +7,7 @@
  * @end
  * -----------------------------------------------------------------------------
  */
+'use strict';
 
 const rp = require('request-promise-native');
 const path = require('path');

@@ -7,6 +7,7 @@
  * @end
  * -----------------------------------------------------------------------------
  */
+'use strict';
 
 const debug = require('debug') ('al_servicec');
 const fs = require('fs');
