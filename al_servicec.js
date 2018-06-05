@@ -7,13 +7,21 @@
  * @end
  * -----------------------------------------------------------------------------
  */
+'use strict';
 
 const debug = require('debug') ('al_servicec');
 const fs = require('fs');
 const path = require('path');
 const m_alUtil = require('./al_util');
 
-const CACHE_DIR = '/tmp';
+const DEFAULT_CACHE_DIR = '/tmp';
+
+const COLLECTOR_TYPES = {
+    CWE : 'cwe',
+    CWL : 'cwl',
+    O365 : 'o365'
+};
+
 
 /**
  * @class
@@ -21,20 +29,21 @@ const CACHE_DIR = '/tmp';
  *
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname
- * @param {Object} aisCreds - Alert Logic API credentials.
- * @param {string} [aisCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {Object} aimsCreds - Alert Logic API credentials.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  *
  */
 class AimsC extends m_alUtil.RestServiceClient {
-    constructor(apiEndpoint, aimsCreds) {
+    constructor(apiEndpoint, aimsCreds, cacheDir) {
         super(apiEndpoint);
         this._cid = null;
         this._aimsAuth = {
             user: aimsCreds.access_key_id,
             password: aimsCreds.secret_key
         };
-        this._tokenCacheFile = path.join(CACHE_DIR,
+        var cache = cacheDir ? cacheDir : DEFAULT_CACHE_DIR;
+        this._tokenCacheFile = path.join(cache,
                 aimsCreds.access_key_id + '-token.tmp');
     }
 
@@ -108,7 +117,7 @@ class AimsC extends m_alUtil.RestServiceClient {
  * @param {string} apiEndpoint - Alert Logic API hostname.
  * @param {string} name - Alert Logic service name.
  * @param {string} version - Alert Logic service HTTP API version.
- * @param {Object} aisCreds - Alert Logic API credentials object, refer to AimsC.
+ * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
  *
  */
 class AlServiceC extends m_alUtil.RestServiceClient {
@@ -140,14 +149,15 @@ class AlServiceC extends m_alUtil.RestServiceClient {
  *
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname.
- * @param {Object} aisCreds - Alert Logic API credentials.
- * @param {string} [aisCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  *
  */
 class IngestC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds) {
+    constructor(apiEndpoint, aimsCreds, functionType) {
         super(apiEndpoint, 'ingest', 'v1', aimsCreds);
+        this._functionType = functionType ? functionType : 'lambda_function';
     }
 
     sendSecmsgs(data) {
@@ -155,7 +165,7 @@ class IngestC extends AlServiceC {
             json : false,
             headers : {
                 'Content-Type': 'alertlogic.com/cwe-json',
-                'x-invoked-by' : 'lambda_function',
+                'x-invoked-by' : this._functionType,
                 'Content-Encoding' : 'deflate',
                 'Content-Length' : Buffer.byteLength(data)
             },
@@ -164,18 +174,32 @@ class IngestC extends AlServiceC {
         return this.post(`/data/secmsgs`, payload);
     }
 
-    sendVpcFlow(data) {
+    sendVpcFlow(data, invokedBy) {
         let payload = {
             json : false,
             headers : {
                 'Content-Type': 'alertlogic.com/cwl-json',
-                'x-invoked-by' : 'lambda_function',
+                'x-invoked-by' : this._functionType,
                 'Content-Encoding' : 'deflate',
                 'Content-Length' : Buffer.byteLength(data)
             },
             body : data
         };
         return this.post(`/data/vpcflow`, payload);
+    }
+    
+    sendAicspmsgs(data, invokedBy) {
+        let payload = {
+            json : false,
+            headers : {
+                'Content-Type': 'alertlogic.com/pass-through',
+                'x-invoked-by' : this._functionType,
+                'Content-Encoding' : 'deflate',
+                'Content-Length' : Buffer.byteLength(data)
+            },
+            body : data
+        };
+        return this.post(`/data/aicspmsgs`, payload);
     }
 }
 
@@ -186,17 +210,46 @@ class IngestC extends AlServiceC {
  *
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname
- * @param {Object} aisCreds - Alert Logic API credentials.
- * @param {string} [aisCreds.access_key_id] - Aert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
+ * @param {string} [aimsCreds.access_key_id] - Aert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
+ * @param {string} collectorType - Al collector type: cwl, cwe, o365 etc
  *
  */
 class AzcollectC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds) {
+    constructor(apiEndpoint, aimsCreds, collectorType) {
         super(apiEndpoint, 'azcollect', 'v1', aimsCreds);
+        switch (collectorType){
+            case COLLECTOR_TYPES.CWE:
+            case COLLECTOR_TYPES.CWL:
+            case COLLECTOR_TYPES.O365:
+                this._collectorType = collectorType;
+                break;
+            default:
+                // Keep for backward compatibility
+                this._collectorType = COLLECTOR_TYPES.CWE;
+                break;
+                // TODO: Should have exception here when cwe-collector is migrated
+                // throw `Unknown collector type: ${collectorType}`;
+        }
     }
 
     doCheckin(checkinValues) {
+        // Deprecated:
+        return this._doCheckinAws(checkinValues);
+    }
+    
+    doRegistration(registrationValues) {
+        // Deprecated:
+       return this._doRegistrationAws(registrationValues);
+    }
+
+    doDeregistration(registrationValues) {
+        // Deprecated:
+        return this._doDeregistrationAws(registrationValues);
+    }
+
+    _doCheckinAws(checkinValues) {
         let statusBody = {
             version : checkinValues.version,
             status : checkinValues.status,
@@ -208,21 +261,72 @@ class AzcollectC extends AlServiceC {
         return this.post(`/aws/${checkinValues.collectorType}/checkin/` +
             `${checkinValues.awsAccountId}/${checkinValues.region}/${functionName}`, {body: statusBody});
     }
+    
+    _doRegistrationAws(registrationValues) {
+        let statusBody = Object.assign({
+             cf_stack_name : registrationValues.stackName,
+             version : registrationValues.version
+         }, registrationValues.custom_fields);
+         var functionName = encodeURIComponent(registrationValues.functionName);
+         return this.post(`/aws/${registrationValues.collectorType}/` +
+             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: statusBody});
+     }
 
-    doRegistration(registrationValues) {
-       let statusBody = Object.assign({
-            cf_stack_name : registrationValues.stackName,
-            version : registrationValues.version
-        }, registrationValues.custom_fields);
-        var functionName = encodeURIComponent(registrationValues.functionName);
-        return this.post(`/aws/${registrationValues.collectorType}/` +
-            `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: statusBody});
+     _doDeregistrationAws(registrationValues) {
+         var functionName = encodeURIComponent(registrationValues.functionName);
+         return this.deleteRequest(`/aws/${registrationValues.collectorType}/` +
+             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`);
+     }
+    
+    _doCheckinAzure(checkinValues) {
+        throw '_doCheckinAzure not implemented';
     }
-
-    doDeregistration(registrationValues) {
-        var functionName = encodeURIComponent(registrationValues.functionName);
-        return this.deleteRequest(`/aws/${registrationValues.collectorType}/` +
-            `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`);
+    
+    _doRegistrationAzure(registrationValues) {
+        throw '_doRegistrationAzure not implemented';
+    }
+    
+    _doDeregistrationAzure(registrationValues) {
+        throw '_doDeregistrationAzure not implemented';
+    }
+    
+    checkin(checkinValues) {
+        switch(this._collectorType) {
+            case COLLECTOR_TYPES.CWE:
+            case COLLECTOR_TYPES.CWL:
+                return this._doCheckinAws(checkinValues);
+                break;
+            case COLLECTOR_TYPES.O365:
+                return this._doCheckinAzure(checkinValues);
+            default:
+                break;
+        }
+    }
+    
+    register(registrationValues) {
+        switch(this._collectorType) {
+            case COLLECTOR_TYPES.CWE:
+            case COLLECTOR_TYPES.CWL:
+                return this._doRegistrationAws(registrationValues);
+                break;
+            case COLLECTOR_TYPES.O365:
+                return this._doRegistrationAzure(registrationValues);
+            default:
+                break;
+        }
+    }
+    
+    deregister(registrationValues) {
+        switch(this._collectorType) {
+            case COLLECTOR_TYPES.CWE:
+            case COLLECTOR_TYPES.CWL:
+                return this._doDeregistrationAws(registrationValues);
+                break;
+            case COLLECTOR_TYPES.O365:
+                return this._doDeregistrationAzure(registrationValues);
+            default:
+                break;
+        }
     }
 
 }
@@ -234,9 +338,9 @@ class AzcollectC extends AlServiceC {
  *
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname.
- * @param {Object} aisCreds - Alert Logic API credentials.
- * @param {string} [aisCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aisCreds.secret_key] - Alert Logic API secret key.
+ * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
+ * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
  *
  */
 class EndpointsC extends AlServiceC {
