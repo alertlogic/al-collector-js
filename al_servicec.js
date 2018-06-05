@@ -257,8 +257,9 @@ class AzcollectC extends AlServiceC {
             details : checkinValues.details,
             statistics : checkinValues.statistics
         };
+        const type = this._collectorType;
         var functionName = encodeURIComponent(checkinValues.functionName);
-        return this.post(`/aws/${checkinValues.collectorType}/checkin/` +
+        return this.post(`/aws/${type}/checkin/` +
             `${checkinValues.awsAccountId}/${checkinValues.region}/${functionName}`, {body: statusBody});
     }
     
@@ -267,14 +268,16 @@ class AzcollectC extends AlServiceC {
              cf_stack_name : registrationValues.stackName,
              version : registrationValues.version
          }, registrationValues.custom_fields);
+        const type = this._collectorType;
          var functionName = encodeURIComponent(registrationValues.functionName);
-         return this.post(`/aws/${registrationValues.collectorType}/` +
+         return this.post(`/aws/${type}/` +
              `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: statusBody});
      }
 
      _doDeregistrationAws(registrationValues) {
+         const type = this._collectorType;
          var functionName = encodeURIComponent(registrationValues.functionName);
-         return this.deleteRequest(`/aws/${registrationValues.collectorType}/` +
+         return this.deleteRequest(`/aws/${type}/` +
              `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`);
      }
     
