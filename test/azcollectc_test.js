@@ -48,23 +48,47 @@ describe('Unit Tests', function() {
 
         it('register', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
-            azc.register({}).then( resp => {done();});
+            
+            const checkinValues = {
+                awsAccountId : '1234567890',
+                functionName : 'test-function',
+                region : 'us-east-1'
+            };
+            azc.register(checkinValues).then( resp => {
+                sinon.assert.calledWith(fakePost, '/aws/cwe/1234567890/us-east-1/test-function');
+                done();
+            });
         });
         
         it('deregister', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
-            azc.deregister({functionName : 'test-fun'}).then( resp => {done();});
+            const checkinValues = {
+                awsAccountId : '1234567890',
+                functionName : 'test-function',
+                region : 'us-east-1'
+            };
+            
+            azc.deregister(checkinValues).then( resp => {
+                sinon.assert.calledWith(fakeDel, '/aws/cwe/1234567890/us-east-1/test-function');
+                done();
+            });
         });
         
         it('checkin', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
 
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
-            azc.checkin({}).then( resp => {done();});
+            const checkinValues = {
+                awsAccountId : '1234567890',
+                functionName : 'test-function',
+                region : 'us-east-1'
+            };
+            azc.checkin(checkinValues).then( resp => {
+                sinon.assert.calledWith(fakePost, '/aws/cwe/checkin/1234567890/us-east-1/test-function');
+                done();
+            });
         });
 
     });
