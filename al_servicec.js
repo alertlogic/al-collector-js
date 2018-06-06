@@ -226,27 +226,8 @@ class AzcollectC extends AlServiceC {
                 this._collectorType = collectorType;
                 break;
             default:
-                // Keep for backward compatibility
-                this._collectorType = COLLECTOR_TYPES.CWE;
-                break;
-                // TODO: Should have exception here when cwe-collector is migrated
-                // throw `Unknown collector type: ${collectorType}`;
+                throw `Unknown collector type: ${collectorType}`;
         }
-    }
-
-    doCheckin(checkinValues) {
-        // Deprecated:
-        return this._doCheckinAws(checkinValues);
-    }
-    
-    doRegistration(registrationValues) {
-        // Deprecated:
-       return this._doRegistrationAws(registrationValues);
-    }
-
-    doDeregistration(registrationValues) {
-        // Deprecated:
-        return this._doDeregistrationAws(registrationValues);
     }
 
     _doCheckinAws(checkinValues) {
