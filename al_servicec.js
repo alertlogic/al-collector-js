@@ -266,7 +266,8 @@ class AzcollectC extends AlServiceC {
     _doRegistrationAws(registrationValues) {
         let statusBody = Object.assign({
              cf_stack_name : registrationValues.stackName,
-             version : registrationValues.version
+             version : registrationValues.version,
+             data_type : registrationValues.dataType ? registrationValues.dataType : 'secmsgs'
          }, registrationValues.custom_fields);
         const type = this._collectorType;
          var functionName = encodeURIComponent(registrationValues.functionName);

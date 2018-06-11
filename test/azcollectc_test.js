@@ -46,17 +46,54 @@ describe('Unit Tests', function() {
             fakeAuth.restore();
         });
 
-        it('register', function(done) {
+        it('register no data type', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
             
             const checkinValues = {
                 awsAccountId : '1234567890',
                 functionName : 'test-function',
-                region : 'us-east-1'
+                region : 'us-east-1',
+                version : '1.0.0',
+                stackName : 'test-stack'
+                
             };
             azc.register(checkinValues).then( resp => {
-                sinon.assert.calledWith(fakePost, '/aws/cwe/1234567890/us-east-1/test-function');
+                sinon.assert.calledWith(fakePost, '/aws/cwe/1234567890/us-east-1/test-function',
+                    { 
+                        body: {
+                            cf_stack_name: 'test-stack',
+                            data_type: 'secmsgs',
+                            version: '1.0.0'
+                        }
+                    });
+                
+                done();
+            });
+        });
+        
+        it('register with data type', function(done) {
+            var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwl');
+            
+            const checkinValues = {
+                awsAccountId : '1234567890',
+                functionName : 'test-function',
+                region : 'us-east-1',
+                version : '1.0.0',
+                stackName : 'test-stack',
+                dataType: 'vpcflow'
+                
+            };
+            azc.register(checkinValues).then( resp => {
+                sinon.assert.calledWith(fakePost, '/aws/cwl/1234567890/us-east-1/test-function',
+                    { 
+                        body: {
+                            cf_stack_name: 'test-stack',
+                            data_type: 'vpcflow',
+                            version: '1.0.0'
+                        }
+                    });
                 done();
             });
         });
