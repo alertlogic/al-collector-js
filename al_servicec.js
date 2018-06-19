@@ -12,6 +12,7 @@
 const debug = require('debug') ('al_servicec');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 const m_alUtil = require('./al_util');
 
 const DEFAULT_CACHE_DIR = '/tmp';
@@ -217,8 +218,9 @@ class IngestC extends AlServiceC {
  *
  */
 class AzcollectC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds, collectorType) {
+    constructor(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed) {
         super(apiEndpoint, 'azcollect', 'v1', aimsCreds);
+        this._sendCheckinCompressed = sendCheckinCompressed ? sendCheckinCompressed : false;
         switch (collectorType){
             case COLLECTOR_TYPES.CWE:
             case COLLECTOR_TYPES.CWL:
@@ -259,10 +261,27 @@ class AzcollectC extends AlServiceC {
         };
         const type = this._collectorType;
         var functionName = encodeURIComponent(checkinValues.functionName);
-        return this.post(`/aws/${type}/checkin/` +
-            `${checkinValues.awsAccountId}/${checkinValues.region}/${functionName}`, {body: statusBody});
+        var checkinUrl = `/aws/${type}/checkin/${checkinValues.awsAccountId}/` +
+                         `${checkinValues.region}/${functionName}`;
+        if (this._sendCheckinCompressed) {
+            var data = zlib.deflateSync(JSON.stringify(statusBody));
+            let payload = {
+                json : false,
+                headers : {
+                    'Content-Encoding' : 'deflate',
+                    'Content-Length' : Buffer.byteLength(data)
+                },
+                body : data
+            };
+            return this.post(checkinUrl, payload);
+        } else {
+            let payload = {
+                 body : statusBody
+            }
+            return this.post(checkinUrl, payload);
+        }
     }
-    
+
     _doRegistrationAws(registrationValues) {
         let statusBody = Object.assign({
              cf_stack_name : registrationValues.stackName,
