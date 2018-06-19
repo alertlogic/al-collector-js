@@ -31,7 +31,7 @@ describe('Unit Tests', function() {
                         resolve('ok');
                     });
             });
-            
+
             fakeDel = sinon.stub(AzcollectC.prototype, 'deleteRequest').callsFake(
                     function fakeFn(path, options) {
                         return new Promise(function(resolve, reject) {
@@ -113,17 +113,28 @@ describe('Unit Tests', function() {
             });
         });
         
-        it('checkin', function(done) {
+        it('checkin (no compression)', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe', false);
+            azc.checkin(m_alMock.CHECKIN).then( resp => {
+                sinon.assert.calledWith(
+                    fakePost,
+                    m_alMock.CHECKIN_URL,
+                    m_alMock.AZCOLLECT_CHECKIN_QUERY
+                );
+                done();
+            });
+        });
 
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
-            const checkinValues = {
-                awsAccountId : '1234567890',
-                functionName : 'test-function',
-                region : 'us-east-1'
-            };
-            azc.checkin(checkinValues).then( resp => {
-                sinon.assert.calledWith(fakePost, '/aws/cwe/checkin/1234567890/us-east-1/test-function');
+        it('checkin (with compression)', function(done) {
+            var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe', true);
+            azc.checkin(m_alMock.CHECKIN).then( resp => {
+                sinon.assert.calledWith(
+                    fakePost,
+                    m_alMock.CHECKIN_URL,
+                    m_alMock.AZCOLLECT_CHECKIN_QUERY_COMPRESSED
+                );
                 done();
             });
         });
