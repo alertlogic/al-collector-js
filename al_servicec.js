@@ -65,22 +65,17 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _isTokenExpired(aimsToken) {
-        return aimsToken.authentication.token_expiration > (Date.now()/1000 + 600);
+        return aimsToken.authentication.token_expiration <= (Date.now()/1000 + 600);
     }
 
     _isTokenMemCached() {
-        return this._aimsResponse && this._isTokenExpired(this._aimsResponse);
+        return (this._aimsResponse != undefined) && !this._isTokenExpired(this._aimsResponse);
     }
 
     _isTokenFileCached() {
         var filename = this._tokenCacheFile;
-        fs.readFile(filename, (readError, fileContent) => {
-            if (readError) {
-                if ( readError.code !== 'ENOENT' ) {
-                    fs.unlinkSync(filename);
-                }
-                return false;
-            }
+        try {
+            var fileContent = fs.readFileSync(filename);
             try {
                 var tokenJson = JSON.parse(fileContent);
                 if (this._isTokenExpired(tokenJson)) {
@@ -90,12 +85,15 @@ class AimsC extends m_alUtil.RestServiceClient {
                     return true;
                 }
             } catch (exception) {
-                // Delete the cache file with malformed data.
                 fs.unlinkSync(filename);
                 return false;
             }
-        });
-
+        } catch (readErrorException) {
+            if (readErrorException.code !== 'ENOENT') {
+                fs.unlinkSync(filename);
+            }
+            return false;
+        }
     }
 
     get cid() {

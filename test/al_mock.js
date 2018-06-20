@@ -5,6 +5,18 @@ const AIMS_CREDS = {
     secret_key: 'test-secret-key'
 };
 
+const AIMS_AUTH = {
+    auth : {
+        user: AIMS_CREDS.access_key_id,
+        password: AIMS_CREDS.secret_key
+    }
+};
+
+const AIMS_TOKEN_TTL = 21600; //6 hours
+const CACHE_FILENAME = '/tmp/' + AIMS_CREDS.access_key_id + '-token.tmp';
+
+const CID = '12345678';
+
 const AL_API = 'al-api-endpoint.alertlogic.com';
 const INGEST_API = 'ingest-api-endpoint.alertlogic.com';
 
@@ -46,6 +58,10 @@ const AZCOLLECT_CHECKIN_QUERY_COMPRESSED = {
 
 module.exports = {
     AIMS_CREDS : AIMS_CREDS,
+    AIMS_AUTH : AIMS_AUTH,
+    AIMS_TOKEN_TTL : AIMS_TOKEN_TTL,
+    CACHE_FILENAME : CACHE_FILENAME,
+    CID : CID,
     AL_API : AL_API,
     INGEST_API : INGEST_API,
     CHECKIN_URL : CHECKIN_URL,
