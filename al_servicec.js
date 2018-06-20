@@ -370,8 +370,8 @@ class EndpointsC extends AlServiceC {
     constructor(apiEndpoint, aimsCreds) {
         super(apiEndpoint, 'endpoints', 'v1', aimsCreds);
     }
-    getEndpoint(serivceName, residency) {
-        return this.get(`/residency/${residency}/services/${serivceName}/endpoint`, {});
+    getEndpoint(serviceName, residency) {
+        return this.get(`/residency/${residency}/services/${serviceName}/endpoint`, {});
     }
 }
 
