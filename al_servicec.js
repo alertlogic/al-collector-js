@@ -49,6 +49,7 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _makeAuthRequest() {
+
         if (this._isTokenMemCached()) {
             return Promise.race([this._aimsResponse]);
         }
@@ -81,6 +82,7 @@ class AimsC extends m_alUtil.RestServiceClient {
                 if (this._isTokenExpired(tokenJson)) {
                     return false;
                 } else {
+                    this._cid = tokenJson.authentication.account.id;
                     this._aimsResponse = tokenJson;
                     return true;
                 }
