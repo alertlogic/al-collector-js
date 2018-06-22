@@ -49,7 +49,6 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _makeAuthRequest() {
-
         if (this._isTokenMemCached()) {
             return Promise.race([this._aimsResponse]);
         }

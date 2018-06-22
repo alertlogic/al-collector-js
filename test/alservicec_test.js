@@ -10,10 +10,6 @@ var servicecRewire = rewire('../al_servicec');
 var m_servicec = require('../al_servicec');
 var RestServiceClient = require('../al_util').RestServiceClient;
 
-const INITIAL_TS = 1529572769;
-const BEFORE_EXPIRED = (INITIAL_TS + 600) * 1000;
-const AFTER_EXPIRED = (INITIAL_TS + m_alMock.AIMS_TOKEN_TTL - 600) * 1000;
-
 
 describe('Unit Tests', function() {
 
@@ -63,11 +59,12 @@ describe('Unit Tests', function() {
         it('check request is called with correct headers', function(done) {
             var aimsC = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var alserviceC = new AlServiceC(m_alMock.AL_API, 'service_name', 'v1', aimsC);
+            var body = {
+                field1 : true,
+                field2: 'false'
+            };
             alserviceC.request('POST', '/some/path', {
-                body : {
-                    field1 : true,
-                    field2: 'false'
-                }
+                body : body
             })
             .then(resp => {
                 sinon.assert.calledWith(fakeRequest,
@@ -75,10 +72,7 @@ describe('Unit Tests', function() {
                         headers : {
                             'x-aims-auth-token' : 'token'
                         },
-                        body : {
-                            field1 : true,
-                            field2: 'false'
-                        }
+                        body : body
                     }
                 );
                 done();
