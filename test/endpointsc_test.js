@@ -20,7 +20,7 @@ describe('Unit Tests', function() {
             fakeAuth = sinon.stub(AimsC.prototype, 'authenticate').callsFake(
                 function fakeFn() {
                     return new Promise(function(resolve, reject) {
-                        resolve({authentication : {token : 'token'}});
+                        resolve(m_alMock.gen_token());
                     });
             });
 

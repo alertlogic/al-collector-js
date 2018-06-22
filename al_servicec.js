@@ -23,6 +23,7 @@ const COLLECTOR_TYPES = {
     O365 : 'o365'
 };
 
+const TOKEN_EXPIRATION_SAFE_PERIOD = 600; //10 minutes
 
 /**
  * @class
@@ -65,37 +66,39 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _isTokenExpired(aimsToken) {
-        return aimsToken.authentication.token_expiration <= (Date.now()/1000 + 600);
+        return aimsToken.authentication.token_expiration <=
+               (Date.now()/1000 + TOKEN_EXPIRATION_SAFE_PERIOD);
     }
 
     _isTokenMemCached() {
-        return (this._aimsResponse != undefined) && !this._isTokenExpired(this._aimsResponse);
+        if (this._aimsResponse) {
+            return !this._isTokenExpired(this._aimsResponse);
+        } else {
+            return false;
+        }
     }
 
     _isTokenFileCached() {
         var filename = this._tokenCacheFile;
         try {
             var fileContent = fs.readFileSync(filename);
-            try {
-                var tokenJson = JSON.parse(fileContent);
-                if (this._isTokenExpired(tokenJson)) {
-                    return false;
-                } else {
-                    this._cid = tokenJson.authentication.account.id;
-                    this._aimsResponse = tokenJson;
-                    return true;
-                }
-            } catch (exception) {
-                fs.unlinkSync(filename);
+            var tokenJson = JSON.parse(fileContent);
+            if (this._isTokenExpired(tokenJson)) {
                 return false;
+            } else {
+                this._cid = tokenJson.authentication.account.id;
+                this._aimsResponse = tokenJson;
+                return true;
             }
-        } catch (readErrorException) {
-            if (readErrorException.code !== 'ENOENT') {
+        } catch (e) {
+            if (e instanceof SyntaxError ||
+               ((e instanceof Error) && e.code !== 'ENOENT')) {
                 fs.unlinkSync(filename);
             }
             return false;
         }
     }
+
 
     get cid() {
         return this._cid;

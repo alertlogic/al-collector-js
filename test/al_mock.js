@@ -56,6 +56,18 @@ const AZCOLLECT_CHECKIN_QUERY_COMPRESSED = {
     body : COMPRESSED_CHECKIN_BODY
 };
 
+function gen_token() {
+    return {
+        authentication : {
+            token : 'token',
+            account : {
+                id : CID
+            },
+            token_expiration : Math.ceil(Date.now()/1000 + AIMS_TOKEN_TTL)
+        }
+    };
+}
+
 module.exports = {
     AIMS_CREDS : AIMS_CREDS,
     AIMS_AUTH : AIMS_AUTH,
@@ -67,5 +79,7 @@ module.exports = {
     CHECKIN_URL : CHECKIN_URL,
     CHECKIN : CHECKIN,
     AZCOLLECT_CHECKIN_QUERY : AZCOLLECT_CHECKIN_QUERY,
-    AZCOLLECT_CHECKIN_QUERY_COMPRESSED : AZCOLLECT_CHECKIN_QUERY_COMPRESSED
+    AZCOLLECT_CHECKIN_QUERY_COMPRESSED : AZCOLLECT_CHECKIN_QUERY_COMPRESSED,
+
+    gen_token : gen_token
 };

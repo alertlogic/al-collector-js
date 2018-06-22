@@ -24,15 +24,7 @@ describe('Unit Tests', function() {
                         options.auth.user == m_alMock.AIMS_AUTH.auth.user &&
                         options.auth.password == m_alMock.AIMS_AUTH.auth.password) {
                         return new Promise(function(resolve, reject) {
-                            resolve({
-                                authentication : {
-                                    token : 'token',
-                                    account : {
-                                        id : m_alMock.CID
-                                    },
-                                    token_expiration : Math.ceil(Date.now()/1000 + m_alMock.AIMS_TOKEN_TTL)
-                                }
-                            });
+                            resolve(m_alMock.gen_token());
                         });
                     } else {
                         return new Promise(function(resolve, reject) {

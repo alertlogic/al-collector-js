@@ -13,6 +13,5 @@ module.exports = {
     AlServiceC : require('./al_servicec').AlServiceC,
     IngestC : require('./al_servicec').IngestC,
     AzcollectC : require('./al_servicec').AzcollectC,
-    EndpointsC : require('./al_servicec').EndpointsC,
-    RestServiceClient : require('./al_util').RestServiceClient
+    EndpointsC : require('./al_servicec').EndpointsC
 };
