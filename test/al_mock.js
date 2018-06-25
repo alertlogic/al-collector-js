@@ -56,7 +56,7 @@ const AZCOLLECT_CHECKIN_QUERY_COMPRESSED = {
     body : COMPRESSED_CHECKIN_BODY
 };
 
-function gen_token() {
+function gen_auth_response() {
     return {
         authentication : {
             token : 'token',
@@ -81,5 +81,5 @@ module.exports = {
     AZCOLLECT_CHECKIN_QUERY : AZCOLLECT_CHECKIN_QUERY,
     AZCOLLECT_CHECKIN_QUERY_COMPRESSED : AZCOLLECT_CHECKIN_QUERY_COMPRESSED,
 
-    gen_token : gen_token
+    gen_auth_response : gen_auth_response
 };

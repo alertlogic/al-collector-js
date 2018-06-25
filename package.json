@@ -15,7 +15,8 @@
     "nyc": "^11.3.0",
     "rewire": "^2.5.2",
     "sinon": "^3.3.0",
-    "timekeeper": "^2.1.2"
+    "timekeeper": "^2.1.2",
+    "nock": "^9.3.3"
   },
   "dependencies": {
     "debug": "*",

@@ -24,7 +24,7 @@ describe('Unit Tests', function() {
                         options.auth.user == m_alMock.AIMS_AUTH.auth.user &&
                         options.auth.password == m_alMock.AIMS_AUTH.auth.password) {
                         return new Promise(function(resolve, reject) {
-                            resolve(m_alMock.gen_token());
+                            resolve(m_alMock.gen_auth_response());
                         });
                     } else {
                         return new Promise(function(resolve, reject) {
