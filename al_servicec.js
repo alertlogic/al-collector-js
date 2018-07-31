@@ -7,9 +7,8 @@
  * @end
  * -----------------------------------------------------------------------------
  */
-'use strict';
 
-const debug = require('debug') ('al_servicec');
+const debug = require('debug')('al_servicec');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
@@ -37,8 +36,9 @@ const TOKEN_EXPIRATION_SAFE_PERIOD = 600; //10 minutes
  *
  */
 class AimsC extends m_alUtil.RestServiceClient {
-    constructor(apiEndpoint, aimsCreds, cacheDir) {
-        super(apiEndpoint);
+    constructor(apiEndpoint, aimsCreds, cacheDir, retryOptions) {
+        'use strict';
+        super(apiEndpoint, retryOptions);
         this._cid = null;
         this._aimsAuth = {
             user: aimsCreds.access_key_id,
@@ -50,6 +50,7 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _makeAuthRequest() {
+        'use strict';
         if (this._isTokenMemCached()) {
             return Promise.race([this._aimsResponse]);
         }
@@ -66,11 +67,13 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _isTokenExpired(aimsToken) {
+        'use strict';
         return aimsToken.authentication.token_expiration <=
                (Date.now()/1000 + TOKEN_EXPIRATION_SAFE_PERIOD);
     }
 
     _isTokenMemCached() {
+        'use strict';
         if (this._aimsResponse) {
             return !this._isTokenExpired(this._aimsResponse);
         } else {
@@ -79,6 +82,7 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _isTokenFileCached() {
+        'use strict';
         var filename = this._tokenCacheFile;
         try {
             var fileContent = fs.readFileSync(filename);
@@ -124,13 +128,15 @@ class AimsC extends m_alUtil.RestServiceClient {
  *
  */
 class AlServiceC extends m_alUtil.RestServiceClient {
-    constructor(apiEndpoint, name, version, aimsCreds) {
-        super(apiEndpoint);
+    constructor(apiEndpoint, name, version, aimsCreds, retryOptions) {
+        'use strict';
+        super(apiEndpoint, retryOptions);
         this._url = this._url + '/' + name + '/' + version;
         this._aimsc = aimsCreds;
     }
 
     request(method, path, extraOptions) {
+        'use strict';
         return this._aimsc.authenticate()
             .then(resp => {
                 const newOptions = Object.assign({}, extraOptions);
@@ -139,7 +145,7 @@ class AlServiceC extends m_alUtil.RestServiceClient {
                                      {};
                 newOptions.headers['x-aims-auth-token'] = resp.authentication.token;
                 var url = '/' + this._aimsc.cid + path;
-                debug(`DEBUG0001: request - method: ${method} path: ${url}`);              
+                debug(`DEBUG0001: request - method: ${method} path: ${url}`);
                 return super.request(method, url, newOptions);
             });
     }
@@ -158,12 +164,14 @@ class AlServiceC extends m_alUtil.RestServiceClient {
  *
  */
 class IngestC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds, functionType) {
-        super(apiEndpoint, 'ingest', 'v1', aimsCreds);
+    constructor(apiEndpoint, aimsCreds, functionType, retryOptions) {
+        'use strict';
+        super(apiEndpoint, 'ingest', 'v1', aimsCreds, retryOptions);
         this._functionType = functionType ? functionType : 'lambda_function';
     }
 
     sendSecmsgs(data) {
+        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -178,6 +186,7 @@ class IngestC extends AlServiceC {
     }
 
     sendVpcFlow(data, invokedBy) {
+        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -192,6 +201,7 @@ class IngestC extends AlServiceC {
     }
     
     sendAicspmsgs(data, invokedBy) {
+        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -220,8 +230,9 @@ class IngestC extends AlServiceC {
  *
  */
 class AzcollectC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed) {
-        super(apiEndpoint, 'azcollect', 'v1', aimsCreds);
+    constructor(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed, retryOptions) {
+        'use strict';
+        super(apiEndpoint, 'azcollect', 'v1', aimsCreds, retryOptions);
         this._sendCheckinCompressed = sendCheckinCompressed ? sendCheckinCompressed : false;
         switch (collectorType){
             case COLLECTOR_TYPES.CWE:
@@ -254,6 +265,7 @@ class AzcollectC extends AlServiceC {
     }
 
     _doCheckinAws(checkinValues) {
+        'use strict';
         let statusBody = {
             version : checkinValues.version,
             status : checkinValues.status,
@@ -279,12 +291,13 @@ class AzcollectC extends AlServiceC {
         } else {
             let payload = {
                  body : statusBody
-            }
+            };
             return this.post(checkinUrl, payload);
         }
     }
 
     _doRegistrationAws(registrationValues) {
+        'use strict';
         let statusBody = Object.assign({
              cf_stack_name : registrationValues.stackName,
              version : registrationValues.version,
@@ -297,6 +310,7 @@ class AzcollectC extends AlServiceC {
      }
 
      _doDeregistrationAws(registrationValues) {
+         'use strict';
          const type = this._collectorType;
          var functionName = encodeURIComponent(registrationValues.functionName);
          return this.deleteRequest(`/aws/${type}/` +
@@ -316,11 +330,11 @@ class AzcollectC extends AlServiceC {
     }
     
     checkin(checkinValues) {
+        'use strict';
         switch(this._collectorType) {
             case COLLECTOR_TYPES.CWE:
             case COLLECTOR_TYPES.CWL:
                 return this._doCheckinAws(checkinValues);
-                break;
             case COLLECTOR_TYPES.O365:
                 return this._doCheckinAzure(checkinValues);
             default:
@@ -329,11 +343,11 @@ class AzcollectC extends AlServiceC {
     }
     
     register(registrationValues) {
+        'use strict';
         switch(this._collectorType) {
             case COLLECTOR_TYPES.CWE:
             case COLLECTOR_TYPES.CWL:
                 return this._doRegistrationAws(registrationValues);
-                break;
             case COLLECTOR_TYPES.O365:
                 return this._doRegistrationAzure(registrationValues);
             default:
@@ -342,11 +356,11 @@ class AzcollectC extends AlServiceC {
     }
     
     deregister(registrationValues) {
+        'use strict';
         switch(this._collectorType) {
             case COLLECTOR_TYPES.CWE:
             case COLLECTOR_TYPES.CWL:
                 return this._doDeregistrationAws(registrationValues);
-                break;
             case COLLECTOR_TYPES.O365:
                 return this._doDeregistrationAzure(registrationValues);
             default:
@@ -369,10 +383,12 @@ class AzcollectC extends AlServiceC {
  *
  */
 class EndpointsC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds) {
-        super(apiEndpoint, 'endpoints', 'v1', aimsCreds);
+    constructor(apiEndpoint, aimsCreds, retryOptions) {
+        'use strict';
+        super(apiEndpoint, 'endpoints', 'v1', aimsCreds, retryOptions);
     }
     getEndpoint(serviceName, residency) {
+        'use strict';
         return this.get(`/residency/${residency}/services/${serviceName}/endpoint`, {});
     }
 }

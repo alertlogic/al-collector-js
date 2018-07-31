@@ -1,13 +1,21 @@
+/* -----------------------------------------------------------------------------
+ * @copyright (C) 2018, Alert Logic, Inc
+ * @doc
+ *
+ * AIMs client tests
+ *
+ * @end
+ * -----------------------------------------------------------------------------
+ */
+
 const fs = require('fs');
 const assert = require('assert');
-const rewire = require('rewire');
 const sinon = require('sinon');
 const tk = require('timekeeper');
 const AimsC = require('../al_servicec').AimsC;
 const AzcollectC = require('../al_servicec').AzcollectC;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('azcollectc_test');
-var servicecRewire = rewire('../al_servicec');
 var m_servicec = require('../al_servicec');
 var RestServiceClient = require('../al_util').RestServiceClient;
 
@@ -49,6 +57,8 @@ describe('Unit Tests', function() {
 
         after(function() {
             clean_file_cache(m_alMock.CACHE_FILENAME);
+            fakeRest.restore();
+            tk.reset();
         });
 
         it('authenticate with cold cache', function(done) {

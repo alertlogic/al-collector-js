@@ -2,7 +2,7 @@
  * @copyright (C) 2018, Alert Logic, Inc
  * @doc
  *
- * Classes for communication to Alert Logic services.
+ * Base library for all Alert Logic collectors .
  *
  * @end
  * -----------------------------------------------------------------------------
@@ -13,5 +13,7 @@ module.exports = {
     AlServiceC : require('./al_servicec').AlServiceC,
     IngestC : require('./al_servicec').IngestC,
     AzcollectC : require('./al_servicec').AzcollectC,
-    EndpointsC : require('./al_servicec').EndpointsC
+    EndpointsC : require('./al_servicec').EndpointsC,
+    AlLog : require('./al_log')
 };
+

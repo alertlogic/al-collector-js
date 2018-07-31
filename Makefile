@@ -1,8 +1,11 @@
-.PHONY: test 
+.PHONY: test deps all compile clean pb pb-clean 
+
+PROTO_DIR=./proto
+
 
 all: test 
 
-deps: node_modules
+deps: node_modules pb
 
 node_modules:
 	npm install
@@ -18,3 +21,10 @@ clean:
 	rm -f package-lock.json
 	rm -f test/report.xml
 	rm -rf ./coverage/
+
+pb: $(PROTO_DIR)
+	cd $(PROTO_DIR) && make compile
+
+pb-clean: $(PROTO_DIR)
+	cd $(PROTO_DIR) && make clean
+
