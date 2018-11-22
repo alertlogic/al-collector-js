@@ -18,11 +18,11 @@ let MAX_CONNS_PER_SERVICE = 128;
  */
 let DEFAULT_RETRY = {
     // Default values
-    // factor: 2,
     // randomize: false
-    minTimeout: 3000,
+    factor: 7,
+    minTimeout: 300,
     retries: 2,
-    maxTimeout: 30000
+    maxTimeout: 10000
 };
 
 /**
