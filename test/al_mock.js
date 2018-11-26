@@ -29,9 +29,9 @@ const CID = '12345678';
 const AL_API = 'al-api-endpoint.alertlogic.com';
 const INGEST_API = 'ingest-api-endpoint.alertlogic.com';
 
-const CHECKIN_URL = '/aws/cwe/checkin/1234567890/us-east-1/test-function';
+const AWS_CHECKIN_URL = '/aws/cwe/checkin/1234567890/us-east-1/test-function';
 
-const CHECKIN = {
+const AWS_CHECKIN = {
     awsAccountId : '1234567890',
     functionName : 'test-function',
     region : 'us-east-1',
@@ -40,6 +40,32 @@ const CHECKIN = {
     error_code : undefined,
     details : [],
     statistics : undefined
+};
+
+const AZURE_REGISTER_VALUES = {
+    version : '1.0.0',
+    web_app_name : 'azure-web-app-name',
+    app_tenant_id : 'azure-tenant-id',
+    app_resource_group : 'azure-resource-group',
+    subscription_id : 'azure-subscription-id',
+    client_id : 'azure-client-id',
+    client_secret : 'azure-client-secret',
+    config : {
+        type : 'o365',
+        content_streams: '[\"Audit.AzureActiveDirectory\", \"Audit.Exchange\", \"Audit.SharePoint\", \"Audit.General\"]'
+    }
+};
+
+const AZURE_CHECKIN_VALUES = {
+    version : '1.0.0',
+    web_app_name : 'azure-web-app-name',
+    app_tenant_id : 'azure-tenant-id',
+    app_resource_group : 'azure-resource-group',
+    subscription_id : 'azure-subscription-id',
+    status: 'ok',
+    error_code: undefined,
+    details: [],
+    statistics: undefined
 };
 
 const AZCOLLECT_CHECKIN_QUERY = {
@@ -134,11 +160,13 @@ module.exports = {
     CID : CID,
     AL_API : AL_API,
     INGEST_API : INGEST_API,
-    CHECKIN_URL : CHECKIN_URL,
-    CHECKIN : CHECKIN,
+    AWS_CHECKIN_URL : AWS_CHECKIN_URL,
+    AWS_CHECKIN : AWS_CHECKIN,
     AZCOLLECT_CHECKIN_QUERY : AZCOLLECT_CHECKIN_QUERY,
     AZCOLLECT_CHECKIN_QUERY_COMPRESSED : AZCOLLECT_CHECKIN_QUERY_COMPRESSED,
     AIMS_RESPONSE_200: AIMS_RESPONSE_200,
+    AZURE_REGISTER_VALUES: AZURE_REGISTER_VALUES,
+    AZURE_CHECKIN_VALUES: AZURE_CHECKIN_VALUES,
 
     gen_auth_response : gen_auth_response
 };

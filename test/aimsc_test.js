@@ -13,7 +13,6 @@ const assert = require('assert');
 const sinon = require('sinon');
 const tk = require('timekeeper');
 const AimsC = require('../al_servicec').AimsC;
-const AzcollectC = require('../al_servicec').AzcollectC;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('azcollectc_test');
 var m_servicec = require('../al_servicec');
