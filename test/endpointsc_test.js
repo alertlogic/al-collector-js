@@ -11,7 +11,6 @@ const fs = require('fs');
 const assert = require('assert');
 const sinon = require('sinon');
 const AimsC = require('../al_servicec').AimsC;
-const AzcollectC = require('../al_servicec').AzcollectC;
 const EndpointsC = require('../al_servicec').EndpointsC;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('azcollectc_test');

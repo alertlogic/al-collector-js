@@ -216,161 +216,6 @@ class IngestC extends AlServiceC {
     }
 }
 
-
-/**
- * @class
- * Helper class for Alert Logic Azcollect.
- *
- * @constructor
- * @param {string} apiEndpoint - Alert Logic API hostname
- * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
- * @param {string} [aimsCreds.access_key_id] - Aert Logic API access key id.
- * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
- * @param {string} collectorType - Al collector type: cwl, cwe, o365 etc
- *
- */
-class AzcollectC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed, retryOptions) {
-        'use strict';
-        super(apiEndpoint, 'azcollect', 'v1', aimsCreds, retryOptions);
-        this._sendCheckinCompressed = sendCheckinCompressed ? sendCheckinCompressed : false;
-        switch (collectorType){
-            case COLLECTOR_TYPES.CWE:
-            case COLLECTOR_TYPES.CWL:
-            case COLLECTOR_TYPES.O365:
-                this._collectorType = collectorType;
-                break;
-            default:
-                // Keep for backward compatibility
-                this._collectorType = COLLECTOR_TYPES.CWE;
-                break;
-                // TODO: Should have exception here when cwe-collector is migrated
-                // throw `Unknown collector type: ${collectorType}`;
-        }
-    }
-
-    doCheckin(checkinValues) {
-        // Deprecated:
-        return this._doCheckinAws(checkinValues);
-    }
-    
-    doRegistration(registrationValues) {
-        // Deprecated:
-       return this._doRegistrationAws(registrationValues);
-    }
-
-    doDeregistration(registrationValues) {
-        // Deprecated:
-        return this._doDeregistrationAws(registrationValues);
-    }
-
-    _doCheckinAws(checkinValues) {
-        'use strict';
-        let statusBody = {
-            version : checkinValues.version,
-            status : checkinValues.status,
-            error_code : checkinValues.error_code,
-            details : checkinValues.details,
-            statistics : checkinValues.statistics
-        };
-        const type = this._collectorType;
-        var functionName = encodeURIComponent(checkinValues.functionName);
-        var checkinUrl = `/aws/${type}/checkin/${checkinValues.awsAccountId}/` +
-                         `${checkinValues.region}/${functionName}`;
-        if (this._sendCheckinCompressed) {
-            var data = zlib.deflateSync(JSON.stringify(statusBody));
-            let payload = {
-                json : false,
-                headers : {
-                    'Content-Encoding' : 'deflate',
-                    'Content-Length' : Buffer.byteLength(data)
-                },
-                body : data
-            };
-            return this.post(checkinUrl, payload);
-        } else {
-            let payload = {
-                 body : statusBody
-            };
-            return this.post(checkinUrl, payload);
-        }
-    }
-
-    _doRegistrationAws(registrationValues) {
-        'use strict';
-        let statusBody = Object.assign({
-             cf_stack_name : registrationValues.stackName,
-             version : registrationValues.version,
-             data_type : registrationValues.dataType ? registrationValues.dataType : 'secmsgs'
-         }, registrationValues.custom_fields);
-        const type = this._collectorType;
-         var functionName = encodeURIComponent(registrationValues.functionName);
-         return this.post(`/aws/${type}/` +
-             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: statusBody});
-     }
-
-     _doDeregistrationAws(registrationValues) {
-         'use strict';
-         const type = this._collectorType;
-         var functionName = encodeURIComponent(registrationValues.functionName);
-         return this.deleteRequest(`/aws/${type}/` +
-             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`);
-     }
-    
-    _doCheckinAzure(checkinValues) {
-        throw '_doCheckinAzure not implemented';
-    }
-    
-    _doRegistrationAzure(registrationValues) {
-        throw '_doRegistrationAzure not implemented';
-    }
-    
-    _doDeregistrationAzure(registrationValues) {
-        throw '_doDeregistrationAzure not implemented';
-    }
-    
-    checkin(checkinValues) {
-        'use strict';
-        switch(this._collectorType) {
-            case COLLECTOR_TYPES.CWE:
-            case COLLECTOR_TYPES.CWL:
-                return this._doCheckinAws(checkinValues);
-            case COLLECTOR_TYPES.O365:
-                return this._doCheckinAzure(checkinValues);
-            default:
-                break;
-        }
-    }
-    
-    register(registrationValues) {
-        'use strict';
-        switch(this._collectorType) {
-            case COLLECTOR_TYPES.CWE:
-            case COLLECTOR_TYPES.CWL:
-                return this._doRegistrationAws(registrationValues);
-            case COLLECTOR_TYPES.O365:
-                return this._doRegistrationAzure(registrationValues);
-            default:
-                break;
-        }
-    }
-    
-    deregister(registrationValues) {
-        'use strict';
-        switch(this._collectorType) {
-            case COLLECTOR_TYPES.CWE:
-            case COLLECTOR_TYPES.CWL:
-                return this._doDeregistrationAws(registrationValues);
-            case COLLECTOR_TYPES.O365:
-                return this._doDeregistrationAzure(registrationValues);
-            default:
-                break;
-        }
-    }
-
-}
-
-
 /**
  * @class
  * HTTPS client for Alert Logic Endpoints service.
@@ -394,8 +239,10 @@ class EndpointsC extends AlServiceC {
 }
 
 
-exports.AlServiceC = AlServiceC;
-exports.AimsC = AimsC;
-exports.IngestC = IngestC;
-exports.EndpointsC = EndpointsC;
-exports.AzcollectC = AzcollectC;
+module.exports = {
+    AlServiceC: AlServiceC,
+    AimsC: AimsC,
+    IngestC: IngestC,
+    EndpointsC: EndpointsC
+};
+

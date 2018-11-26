@@ -131,4 +131,7 @@ class RestServiceClient {
     }
 }
 
-exports.RestServiceClient = RestServiceClient;
+module.exports = {
+    RestServiceClient: RestServiceClient
+};
+
