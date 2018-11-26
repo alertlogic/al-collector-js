@@ -1,12 +1,20 @@
+/* -----------------------------------------------------------------------------
+ * @copyright (C) 2018, Alert Logic, Inc
+ * @doc
+ *
+ * Tests for Alert Logic Azcollect service client
+ *
+ * @end
+ * -----------------------------------------------------------------------------
+ */
 
+const fs = require('fs');
 const assert = require('assert');
-const rewire = require('rewire');
 const sinon = require('sinon');
 const AimsC = require('../al_servicec').AimsC;
 const AzcollectC = require('../al_servicec').AzcollectC;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('azcollectc_test');
-var servicecRewire = rewire('../al_servicec');
 var m_servicec = require('../al_servicec');
 var RestServiceClient = require('../al_util').RestServiceClient;
 
@@ -40,12 +48,15 @@ describe('Unit Tests', function() {
                 });
         });
         
-        afterEach(function() {
+        afterEach(function(done) {
             fakePost.restore();
             fakeDel.restore();
             fakeAuth.restore();
+            fs.unlink(m_alMock.CACHE_FILENAME, function(err){
+                done();
+            });
         });
-
+        
         it('register no data type', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');

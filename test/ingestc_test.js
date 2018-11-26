@@ -1,12 +1,19 @@
-
+/* -----------------------------------------------------------------------------
+ * @copyright (C) 2018, Alert Logic, Inc
+ * @doc
+ *
+ * Tests for Alert Logic Ingest service client
+ *
+ * @end
+ * -----------------------------------------------------------------------------
+ */
+const fs = require('fs');
 const assert = require('assert');
-const rewire = require('rewire');
 const sinon = require('sinon');
 const AimsC = require('../al_servicec').AimsC;
 const IngestC = require('../al_servicec').IngestC;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('ingestc_test');
-var servicecRewire = rewire('../al_servicec');
 var m_servicec = require('../al_servicec');
 
 describe('Unit Tests', function() {
@@ -23,9 +30,12 @@ describe('Unit Tests', function() {
                     });
             });
         });
-        afterEach(function() {
+        afterEach(function(done) {
             fakePost.restore();
             fakeAuth.restore();
+            fs.unlink(m_alMock.CACHE_FILENAME, function(err){
+                done();
+            });
         });
 
         it('Verify secmsgs body', function(done) {

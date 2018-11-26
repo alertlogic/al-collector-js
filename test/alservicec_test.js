@@ -1,12 +1,21 @@
+/* -----------------------------------------------------------------------------
+ * @copyright (C) 2018, Alert Logic, Inc
+ * @doc
+ *
+ * Tests for base Alert Logic service client
+ *
+ * @end
+ * -----------------------------------------------------------------------------
+ */
+
+const fs = require('fs');
 const assert = require('assert');
-const rewire = require('rewire');
 const sinon = require('sinon');
 const AimsC = require('../al_servicec').AimsC;
 const AzcollectC = require('../al_servicec').AzcollectC;
 const AlServiceC = require('../al_servicec').AlServiceC;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('azcollectc_test');
-var servicecRewire = rewire('../al_servicec');
 var m_servicec = require('../al_servicec');
 var RestServiceClient = require('../al_util').RestServiceClient;
 
@@ -18,7 +27,8 @@ describe('Unit Tests', function() {
         var fakeRequest;
 
         beforeEach(function() {
-            fakeAims = sinon.stub(RestServiceClient.prototype, 'post').callsFake(
+            fakeAims = sinon.stub(RestServiceClient.prototype, 'post');
+            fakeAims.callsFake(
                 function fakeFn(path, options) {
                     if (path == '/aims/v1/authenticate' &&
                         options.auth.user == m_alMock.AIMS_AUTH.auth.user &&
@@ -42,11 +52,13 @@ describe('Unit Tests', function() {
             );
         });
 
-        afterEach(function() {
+        afterEach(function(done) {
             fakeRequest.restore();
             fakeAims.restore();
+            fs.unlink(m_alMock.CACHE_FILENAME, function(err){
+                done();
+            });
         });
-
 
         it('check request is called with correct headers', function(done) {
             var aimsC = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);

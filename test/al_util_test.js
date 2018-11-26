@@ -1,5 +1,15 @@
+/* -----------------------------------------------------------------------------
+ * @copyright (C) 2018, Alert Logic, Inc
+ * @doc
+ *
+ * Mainly tests for REST service client
+ *
+ * @end
+ * -----------------------------------------------------------------------------
+ */
+
+const fs = require('fs');
 const assert = require('assert');
-const rewire = require('rewire');
 const sinon = require('sinon');
 const nock = require('nock');
 const rp = require('request-promise-native');
@@ -7,7 +17,6 @@ const req = require('request');
 const RestServiceClient = require('../al_util').RestServiceClient;
 const m_alMock = require('./al_mock');
 const debug = require('debug') ('azcollectc_test');
-var servicecRewire = rewire('../al_servicec');
 var m_servicec = require('../al_servicec');
 
 const TEST_PATH = '/some/path';
@@ -20,6 +29,19 @@ const TEST_BODY = {
 describe('Unit Tests', function() {
 
     describe('RestServiceClient', function() {
+        beforeEach(function(done) {
+            if (!nock.isActive()) {
+                nock.activate();
+            }
+            done();
+        });
+        afterEach(function(done) {
+            nock.cleanAll();
+            fs.unlink(m_alMock.CACHE_FILENAME, function(err){
+                done();
+            });
+        });
+        
         it('test request', function(done) {
             var restC = new RestServiceClient(m_alMock.AL_API);
             var restMock = nock('https://' + m_alMock.AL_API, {
@@ -32,7 +54,7 @@ describe('Unit Tests', function() {
                 })
                 .post(TEST_PATH, TEST_BODY)
                 .times(1)
-                .reply(204);
+                .reply(204, m_alMock.AIMS_RESPONSE_200);
             restC.request('POST', TEST_PATH, {
                 headers : {'some_header' : 'some_value'},
                 body : TEST_BODY
@@ -55,7 +77,7 @@ describe('Unit Tests', function() {
                 })
                 .post(TEST_PATH, TEST_BODY)
                 .times(1)
-                .reply(204);
+                .reply(204, m_alMock.AIMS_RESPONSE_200);
             restC.post(TEST_PATH, {
                 headers : {'some_header' : 'some_value'},
                 body : TEST_BODY
@@ -77,7 +99,7 @@ describe('Unit Tests', function() {
                 })
                 .get(TEST_PATH)
                 .times(1)
-                .reply(204);
+                .reply(204, m_alMock.AIMS_RESPONSE_200);
             restC.get(TEST_PATH, {
                 headers : {'some_header' : 'some_value'}
             })
@@ -98,7 +120,7 @@ describe('Unit Tests', function() {
                 })
                 .delete(TEST_PATH)
                 .times(1)
-                .reply(204);
+                .reply(204, m_alMock.AIMS_RESPONSE_200);
             restC.deleteRequest(TEST_PATH, {
                 headers : {'some_header' : 'some_value'}
             })
