@@ -11,9 +11,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const alLog = require('../al_log');
-const m_alMock = require('./al_mock');
-const m_alService = require('../al_servicec');
-const m_alUtil = require('../al_util');
 
 
 describe('Unit Tests', function() {
@@ -93,7 +90,6 @@ describe('Unit Tests', function() {
                 messagePayload.message = JSON.stringify(messagePayload);
                 return messagePayload;
             };
-            var expectedPayload = '';
             alLog.buildPayload('host-id', 'source-id', hml, msgs, parseFun, function(err, payload){
                 sinon.match(err, 'Maximum payload size exceeded');
                 return done();

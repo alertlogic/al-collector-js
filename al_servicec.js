@@ -11,16 +11,9 @@
 const debug = require('debug')('al_servicec');
 const fs = require('fs');
 const path = require('path');
-const zlib = require('zlib');
 const m_alUtil = require('./al_util');
 
 const DEFAULT_CACHE_DIR = '/tmp';
-
-const COLLECTOR_TYPES = {
-    CWE : 'cwe',
-    CWL : 'cwl',
-    O365 : 'o365'
-};
 
 const TOKEN_EXPIRATION_SAFE_PERIOD = 600; //10 minutes
 

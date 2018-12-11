@@ -8,10 +8,7 @@
  * -----------------------------------------------------------------------------
  */
 
-const fs = require('fs');
-const path = require('path');
 const zlib = require('zlib');
-const m_alUtil = require('./al_util');
 const AlServiceC = require('./al_servicec').AlServiceC;
 
 const COLLECTOR_TYPES = {

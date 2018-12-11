@@ -13,7 +13,6 @@ const sinon = require('sinon');
 const AimsC = require('../al_servicec').AimsC;
 const IngestC = require('../al_servicec').IngestC;
 const m_alMock = require('./al_mock');
-const debug = require('debug') ('ingestc_test');
 var m_servicec = require('../al_servicec');
 
 describe('Unit Tests', function() {

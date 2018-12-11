@@ -10,14 +10,9 @@
 
 const fs = require('fs');
 const assert = require('assert');
-const sinon = require('sinon');
 const nock = require('nock');
-const rp = require('request-promise-native');
-const req = require('request');
 const RestServiceClient = require('../al_util').RestServiceClient;
 const m_alMock = require('./al_mock');
-const debug = require('debug') ('azcollectc_test');
-var m_servicec = require('../al_servicec');
 
 const TEST_PATH = '/some/path';
 const TEST_BODY = {
