@@ -12,7 +12,6 @@ const fs = require('fs');
 const assert = require('assert');
 const nock = require('nock');
 const m_alMock = require('./al_mock');
-const alLog = require('../al_log');
 const m_alService = require('../al_servicec');
 
 describe('HTTP request retry tests', function() {
@@ -30,8 +29,7 @@ describe('HTTP request retry tests', function() {
     });
 
     it('No retries on success', function(done) {
-        
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .reply(200, m_alMock.AIMS_RESPONSE_200)
             .post('/aims/v1/authenticate')
@@ -52,7 +50,7 @@ describe('HTTP request retry tests', function() {
     });
     
     it('No retries on success with default retry config', function(done) {
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .reply(200, m_alMock.AIMS_RESPONSE_200)
             .post('/aims/v1/authenticate')
@@ -68,7 +66,7 @@ describe('HTTP request retry tests', function() {
     
     it('Retry 500 with default retry config', function(done) {
         this.timeout(4000);
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .reply(500, {statusCode: 500})
             .post('/aims/v1/authenticate')
@@ -85,7 +83,7 @@ describe('HTTP request retry tests', function() {
     
     it('Retry errno with default retry config', function(done) {
         this.timeout(4000);
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .replyWithError({errno: 'ENOTFOUND'})
             .post('/aims/v1/authenticate')
@@ -101,7 +99,7 @@ describe('HTTP request retry tests', function() {
     });
     
     it('Do not retry 4XX with default retry config', function(done) {
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .reply(401, {statusCode: 401})
             .post('/aims/v1/authenticate')
@@ -123,7 +121,7 @@ describe('HTTP request retry tests', function() {
     
     it('Test custom retry callback gets called on 200', function(done) {
         var customRetryCode = 111;
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .reply(200, {retryCode: customRetryCode})
             .post('/aims/v1/authenticate')
@@ -153,7 +151,7 @@ describe('HTTP request retry tests', function() {
     
     it('Test custom retry callback gets called on error', function(done) {
         var customRetryCode = 'ECUSTOM';
-        var aimsMock = nock('https://' + m_alMock.AL_API)
+        nock('https://' + m_alMock.AL_API)
             .post('/aims/v1/authenticate')
             .replyWithError({customError: customRetryCode})
             .post('/aims/v1/authenticate')

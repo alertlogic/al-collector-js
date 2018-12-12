@@ -120,15 +120,6 @@ function buildType(type, payload, callback) {
     return callback(null, payloadCreated);
 }
 
-
-function buildTypeSync(type, payload) {
-    var verify = type.verify(payload);
-    if (verify)
-        throw(verify);
-
-    return type.create(payload);
-}
-
 /**
  *  @function build hostmeta protobuf out of a list of {key, value} metadata pairs.
  *  
@@ -164,7 +155,7 @@ function buildHostmeta(hostId, hostmetaElems, callback) {
             };
             var sha = crypto.createHash('sha1');
             var hashPayload = hostmetaType.encode(meta).finish();
-            hashValue = sha.update(hashPayload).digest();
+            var hashValue = sha.update(hashPayload).digest();
             
             var metadataPayload = {
                 hostUuid : hostId,
