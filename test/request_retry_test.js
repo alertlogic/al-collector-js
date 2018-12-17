@@ -13,6 +13,7 @@ const assert = require('assert');
 const nock = require('nock');
 const m_alMock = require('./al_mock');
 const m_alService = require('../al_servicec');
+const EndpointsC = require('../al_servicec').EndpointsC;
 
 describe('HTTP request retry tests', function() {
     beforeEach(function(done) {
@@ -62,6 +63,25 @@ describe('HTTP request retry tests', function() {
                 assert.equal(resp.authentication.user.name, 'user-name');
                 return done();
             });
+    });
+    
+    it('No retries on 204 empty response', function(done) {
+        nock('https://' + m_alMock.AL_API)
+            .post('/aims/v1/authenticate')
+            .reply(200, m_alMock.AIMS_RESPONSE_200);
+        nock('https://' + m_alMock.AL_API)
+            .get(/endpoint$/)
+            .reply(204)
+            .get(/endpoint$/)
+            .reply(500, {statusCode: 500});
+        var aimsc = new m_alService.AimsC(
+                m_alMock.AL_API, m_alMock.AIMS_CREDS, '/tmp');
+        var endpointsC = new EndpointsC(m_alMock.AL_API, aimsc, 'cwe');
+
+        endpointsC.getEndpoint('azcollect', 'default').then( resp => {
+            assert.equal(resp, undefined);
+            done();
+        });
     });
     
     it('Retry 500 with default retry config', function(done) {
