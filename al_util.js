@@ -31,8 +31,9 @@ let DEFAULT_RETRY = {
  *  Keeps retrying 5XX HTTP responses and any system level errors
  **/
 var defaultRetryCb = function(err){
-    if (err.statusCode >= 500 ||
-        (err.error && err.error.errno)) {
+    if (err && 
+        (err.statusCode >= 500 ||
+        (err.error && err.error.errno))) {
         return true;
     } else {
         return false;
