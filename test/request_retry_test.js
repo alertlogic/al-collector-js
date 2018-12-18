@@ -147,7 +147,7 @@ describe('HTTP request retry tests', function() {
             .post('/aims/v1/authenticate')
             .reply(201, m_alMock.AIMS_RESPONSE_200);
         var customRetry = function(resp) {
-            if (resp.retryCode == customRetryCode) {
+            if (resp.retryCode === customRetryCode) {
                 return true;
             } else {
                 return false;
@@ -177,7 +177,7 @@ describe('HTTP request retry tests', function() {
             .post('/aims/v1/authenticate')
             .reply(201, m_alMock.AIMS_RESPONSE_200);
         var customRetry = function(resp) {
-            if (resp.error.customError == customRetryCode) {
+            if (resp.error.customError === customRetryCode) {
                 return false;
             } else {
                 return true;
