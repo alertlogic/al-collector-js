@@ -26,9 +26,9 @@ describe('Unit Tests', function() {
             fakeAims = sinon.stub(RestServiceClient.prototype, 'post');
             fakeAims.callsFake(
                 function fakeFn(path, options) {
-                    if (path == '/aims/v1/authenticate' &&
-                        options.auth.user == m_alMock.AIMS_AUTH.auth.user &&
-                        options.auth.password == m_alMock.AIMS_AUTH.auth.password) {
+                    if (path === '/aims/v1/authenticate' &&
+                        options.auth.user === m_alMock.AIMS_AUTH.auth.user &&
+                        options.auth.password === m_alMock.AIMS_AUTH.auth.password) {
                         return new Promise(function(resolve, reject) {
                             resolve(m_alMock.gen_auth_response());
                         });

@@ -178,7 +178,7 @@ class IngestC extends AlServiceC {
         return this.post(`/data/secmsgs`, payload);
     }
 
-    sendVpcFlow(data, invokedBy) {
+    sendVpcFlow(data) {
         'use strict';
         let payload = {
             json : false,
@@ -193,7 +193,7 @@ class IngestC extends AlServiceC {
         return this.post(`/data/vpcflow`, payload);
     }
     
-    sendAicspmsgs(data, invokedBy) {
+    sendAicspmsgs(data) {
         'use strict';
         let payload = {
             json : false,
