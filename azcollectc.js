@@ -147,7 +147,7 @@ class AzcollectC extends AlServiceC {
         delete deregBody.subscription_id;
         delete deregBody.web_app_name;
         return this.deleteRequest(`/azure/${collectorType}/` +
-            `${deregInput.subscription_id}/${deregInput.app_resource_group}/${functionName}`);
+            `${deregInput.subscription_id}/${deregInput.app_resource_group}/${functionName}`, {body: deregBody});
     }
     
     _doSendCheckin(checkinUrl, checkinBody) {

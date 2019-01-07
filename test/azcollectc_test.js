@@ -189,7 +189,7 @@ describe('Unit Tests', function() {
         it('Azure register', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'o365');
-            var expectedChekinBody = {
+            var expectedRegisterBody = {
                 body: {
                     app_tenant_id: 'azure-tenant-id',
                     client_id: 'azure-client-id',
@@ -204,7 +204,7 @@ describe('Unit Tests', function() {
             
             azc.register(m_alMock.AZURE_REGISTER_VALUES).then( resp => {
                 sinon.assert.calledWith(fakePost, '/azure/o365/azure-subscription-id/azure-resource-group/azure-web-app-name',
-                        expectedChekinBody);
+                        expectedRegisterBody);
                 
                 done();
             });
@@ -216,12 +216,20 @@ describe('Unit Tests', function() {
             const deregValues = {
                 web_app_name : 'azure-web-app-name',
                 app_tenant_id : 'azure-tenant-id',
+                source_id: 'source-id',
                 app_resource_group : 'azure-resource-group',
                 subscription_id : 'azure-subscription-id',
             };
             
+            const expectedDeregBody = {
+                body: {
+                    app_tenant_id : 'azure-tenant-id',
+                    source_id: 'source-id'
+                }
+            };
+            
             azc.deregister(deregValues).then( resp => {
-                sinon.assert.calledWith(fakeDel, '/azure/ehub/azure-subscription-id/azure-resource-group/azure-web-app-name');
+                sinon.assert.calledWith(fakeDel, '/azure/ehub/azure-subscription-id/azure-resource-group/azure-web-app-name', expectedDeregBody);
                 done();
             });
         });
