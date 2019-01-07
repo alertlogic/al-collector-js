@@ -113,30 +113,41 @@ class AzcollectC extends AlServiceC {
              `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`);
      }
     
-    _doCheckinAzure(checkinBody) {
+    _doCheckinAzure(checkinInput) {
         'use strict';
+        var checkinBody = Object.assign({}, checkinInput);
         const type = this._collectorType;
         var functionName = encodeURIComponent(checkinBody.web_app_name);
-        var checkinUrl = `/azure/${type}/checkin/${checkinBody.subscription_id}/` +
-                         `${checkinBody.app_resource_group}/${functionName}`;
+        var checkinUrl = `/azure/${type}/checkin/${checkinInput.subscription_id}/` +
+                         `${checkinInput.app_resource_group}/${functionName}`;
+        delete checkinBody.app_resource_group;
+        delete checkinBody.subscription_id;
+        delete checkinBody.web_app_name;
         return this._doSendCheckin(checkinUrl, checkinBody);
     }
     
-    _doRegistrationAzure(regBody) {
+    _doRegistrationAzure(regInput) {
         'use strict';
-         const collectorType = this._collectorType;
-         const functionName = encodeURIComponent(regBody.web_app_name);
-         
-         return this.post(`/azure/${collectorType}/` +
-             `${regBody.subscription_id}/${regBody.app_resource_group}/${functionName}`, {body: regBody});
+        var regBody = Object.assign({}, regInput);
+        const collectorType = this._collectorType;
+        const functionName = encodeURIComponent(regInput.web_app_name);
+        delete regBody.app_resource_group;
+        delete regBody.subscription_id;
+        delete regBody.web_app_name;
+        return this.post(`/azure/${collectorType}/` +
+                `${regInput.subscription_id}/${regInput.app_resource_group}/${functionName}`, {body: regBody});
     }
     
-    _doDeregistrationAzure(deregBody) {
+    _doDeregistrationAzure(deregInput) {
         'use strict';
+        var deregBody = Object.assign({}, deregInput);
         const collectorType = this._collectorType;
         var functionName = encodeURIComponent(deregBody.web_app_name);
+        delete deregBody.app_resource_group;
+        delete deregBody.subscription_id;
+        delete deregBody.web_app_name;
         return this.deleteRequest(`/azure/${collectorType}/` +
-            `${deregBody.subscription_id}/${deregBody.app_resource_group}/${functionName}`);
+            `${deregInput.subscription_id}/${deregInput.app_resource_group}/${functionName}`, {body: deregBody});
     }
     
     _doSendCheckin(checkinUrl, checkinBody) {
