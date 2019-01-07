@@ -191,7 +191,6 @@ describe('Unit Tests', function() {
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'o365');
             var expectedChekinBody = {
                 body: {
-                    app_resource_group: 'azure-resource-group',
                     app_tenant_id: 'azure-tenant-id',
                     client_id: 'azure-client-id',
                     client_secret: 'azure-client-secret',
@@ -199,9 +198,7 @@ describe('Unit Tests', function() {
                       content_streams: '[\"Audit.AzureActiveDirectory\", \"Audit.Exchange\", \"Audit.SharePoint\", \"Audit.General\"]',
                       type: 'o365'
                     },
-                    subscription_id: 'azure-subscription-id',
-                    version: '1.0.0',
-                    web_app_name: 'azure-web-app-name'
+                    version: '1.0.0'
                 }
             };
             
@@ -233,7 +230,14 @@ describe('Unit Tests', function() {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'ehub', false);
             var expectedCheckinBody = {
-                    body: m_alMock.AZURE_CHECKIN_VALUES
+                    body: {
+                        version : '1.0.0',
+                        app_tenant_id : 'azure-tenant-id',
+                        status: 'ok',
+                        error_code: undefined,
+                        details: [],
+                        statistics: undefined
+                    }
             };
             azc.checkin(m_alMock.AZURE_CHECKIN_VALUES).then( resp => {
                 sinon.assert.calledWith(
@@ -248,7 +252,16 @@ describe('Unit Tests', function() {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'ehub', true);
             
-            var expectedCompressedBody = zlib.deflateSync(JSON.stringify(m_alMock.AZURE_CHECKIN_VALUES));
+            var expectedCheckin = {
+                version : '1.0.0',
+                app_tenant_id : 'azure-tenant-id',
+                status: 'ok',
+                error_code: undefined,
+                details: [],
+                statistics: undefined
+            };
+            
+            var expectedCompressedBody = zlib.deflateSync(JSON.stringify(expectedCheckin));
             var expectedCheckinBody = {
                 json : false,
                 headers : {
