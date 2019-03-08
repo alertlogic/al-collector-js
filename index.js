@@ -14,6 +14,7 @@ module.exports = {
     IngestC : require('./al_servicec').IngestC,
     AzcollectC : require('./azcollectc').AzcollectC,
     EndpointsC : require('./al_servicec').EndpointsC,
-    AlLog : require('./al_log')
+    AlLog : require('./al_log'),
+    Parse: require('./parse')
 };
 
