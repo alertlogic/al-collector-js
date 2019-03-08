@@ -24,7 +24,8 @@
     "protobufjs": "^6.8.8",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
-    "retry": "^0.12.0"
+    "retry": "^0.12.0",
+    "rewire": "^4.0.1"
   },
   "author": "Alert Logic Inc."
 }
