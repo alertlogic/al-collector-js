@@ -75,7 +75,7 @@ describe('Unit Tests', function() {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             assert.equal(aimsc.cid, null);
             aimsc.authenticate()
-            .then(resp => {
+            .then(() => {
                 assert.equal(aimsc.cid, m_alMock.CID);
                 done();
             });
@@ -86,7 +86,7 @@ describe('Unit Tests', function() {
             assert_cache(aimsc, false, false);
             assert.equal(aimsc.cid, undefined);
             aimsc.authenticate()
-            .then(resp => {
+            .then(() => {
                 sinon.assert.calledWith(fakeRest,
                     '/aims/v1/authenticate', m_alMock.AIMS_AUTH
                 );
@@ -94,13 +94,13 @@ describe('Unit Tests', function() {
                 assert_cache(aimsc, true, true);
                 assert.equal(aimsc.cid, m_alMock.CID);
                 aimsc.authenticate()
-                .then(resp => {
+                .then(() => {
                     sinon.assert.callCount(fakeRest, 1);
                     tk.travel(AFTER_EXPIRED);
                     assert_cache(aimsc, false, false);
                     assert.equal(aimsc.cid, m_alMock.CID);
                     aimsc.authenticate()
-                    .then(resp => {
+                    .then(() => {
                         sinon.assert.callCount(fakeRest, 2);
                         assert_cache(aimsc, true, true);
                         assert.equal(aimsc.cid, m_alMock.CID);
@@ -116,7 +116,7 @@ describe('Unit Tests', function() {
             assert_cache(aimsc1, false, false);
             assert.equal(aimsc1.cid, undefined);
             aimsc1.authenticate()
-            .then(resp => {
+            .then(() => {
                 sinon.assert.calledWith(fakeRest,
                     '/aims/v1/authenticate', m_alMock.AIMS_AUTH
                 );
@@ -127,7 +127,7 @@ describe('Unit Tests', function() {
                 assert.equal(aimsc1.cid, m_alMock.CID);
                 assert.equal(aimsc2.cid, m_alMock.CID);
                 aimsc2.authenticate()
-                .then(resp => {
+                .then(() => {
                     sinon.assert.callCount(fakeRest, 1);
                     assert_cache(aimsc2, true, true);
                     assert.equal(aimsc2.cid, m_alMock.CID);
@@ -137,7 +137,7 @@ describe('Unit Tests', function() {
                     assert_cache(aimsc3, false, false);
                     assert.equal(aimsc3.cid, undefined);
                     aimsc3.authenticate()
-                    .then(resp => {
+                    .then(() => {
                         sinon.assert.callCount(fakeRest, 2);
                         assert_cache(aimsc2, false, true);
                         assert_cache(aimsc3, true, true);
@@ -153,7 +153,7 @@ describe('Unit Tests', function() {
             var aimsc1 = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             assert_cache(aimsc1, false, false);
             aimsc1.authenticate()
-            .then(resp => {
+            .then(() => {
                 tk.travel(BEFORE_EXPIRED);
                 assert_cache(aimsc1, true, true);
                 malform_cache_file(m_alMock.CACHE_FILENAME);
@@ -161,7 +161,7 @@ describe('Unit Tests', function() {
                 assert_cache(aimsc1, true, false);
                 assert_cache(aimsc2, false, false);
                 aimsc2.authenticate()
-                .then(resp => {
+                .then(() => {
                     sinon.assert.callCount(fakeRest, 2);
                     assert_cache(aimsc1, true, true);
                     assert_cache(aimsc2, true, true);
