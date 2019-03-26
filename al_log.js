@@ -57,7 +57,7 @@ const PAYLOAD_BATCH_SIZE = 700000;
  *  For an AWS Lambda via kinesis trigger batch size configuration.
  */
 
-var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCallback, callback) {
+var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCallback, mainCallback) {
     async.waterfall([
         function(callback) {
             buildMessages(content, parseCallback, function(err, msg) {
@@ -86,17 +86,17 @@ var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCall
         }],
         function(err, result) {
             if (err) {
-                return callback(err);
+                return mainCallback(err);
             } else {
-                zlib.deflate(result, function(err, compressed) {
-                    if (err) {
-                        return callback(err);
+                zlib.deflate(result, function(defalteErr, compressed) {
+                    if (defalteErr) {
+                        return mainCallback(defalteErr);
                     } else {
                         var payloadSize = compressed.byteLength;
                         if (payloadSize > PAYLOAD_BATCH_SIZE) {
-                            return callback(`Maximum payload size exceeded: ${payloadSize}`, compressed);
+                            return mainCallback(`Maximum payload size exceeded: ${payloadSize}`, compressed);
                         } else {
-                            return callback(null, compressed);
+                            return mainCallback(null, compressed);
                         }
                     }
                 });
@@ -189,15 +189,15 @@ function buildHostmeta(hostId, hostmetaElems, callback) {
  */
 
 function buildMessages(content, parseContentFun, callback) {
-    async.reduce(content, [], function(memo, item, callback) {
+    async.reduce(content, [], function(memo, item, asyncCallback) {
         var messageType = commonProtoPb.collected_message;
         var messagePayload = parseContentFun(item);
         buildType(messageType, messagePayload, function(err, buf) {
             if (err) {
-                return callback(err);
+                return asyncCallback(err);
             } else {
                 memo.push(buf);
-                return callback(err, memo);
+                return asyncCallback(err, memo);
             }
         });
     },

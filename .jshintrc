@@ -1,6 +1,17 @@
 {
   "eqeqeq": true,
   "esversion": 6,
-  "mocha": true,
-  "node": true
+  "shadow": "outer",
+  "undef": true,
+  "unused": "vars",
+  "node":  true,
+  "predef": [
+    "it",
+    "describe",
+    "before",
+    "after",
+    "beforeEach",
+    "afterEach"
+  ],
+  "mocha": true
 }
