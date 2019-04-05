@@ -1,11 +1,11 @@
 {
-  "name": "al-collector-js",
+  "name": "@alertlogic/al-collector-js",
   "version": "1.1.1",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
       "type": "git",
-      "url": "https://github.com/alertlogic/al-collector-js"
+      "url": "https://github.com/alertlogic/al-collector-js#npm"
   },
   "scripts": {
     "lint": "jshint --show-non-errors --exclude \"./node_modules/*,./proto/*\" **/*.js *.js",
