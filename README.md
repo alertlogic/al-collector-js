@@ -16,7 +16,7 @@ To install:
 `npm install --save @alertlogic/al-collector-js`
 
 and in your file:
-```JAVASCRIPT
+```javascript
 const {
     AimsC,
     AlServiceC,
@@ -25,7 +25,8 @@ const {
     EndpointsC,
     AlLog,
     Parse 
-} = require('@alertlogic/al-collector-js');  ```
+} = require('@alertlogic/al-collector-js');
+```
 
 
 # API
@@ -39,7 +40,8 @@ const {
 * @param {Object} retryOptions(optional) - Retry Options.
 
 ```javascript
-const aimsClient = new AimsC(endPoint, aimsCredsi, cacheDir, retryOption);```
+const aimsClient = new AimsC(endPoint, aimsCredsi, cacheDir, retryOption);
+```
 
 ## AlServiceC
 * @param {string} apiEndpoint - Alert Logic API hostname. 
@@ -49,7 +51,8 @@ const aimsClient = new AimsC(endPoint, aimsCredsi, cacheDir, retryOption);```
 * @param {Object} retryOptions(optional) - Retry Options.
 
 ```javascript
-const alServiceClient = new AlServiceC(apiEndpoint, name, version, aimsCreds, retryOptions);```
+const alServiceClient = new AlServiceC(apiEndpoint, name, version, aimsCreds, retryOptions);
+```
 
 ## IngestC
 * @param {string} apiEndpoint - Alert Logic API hostname. 
@@ -60,7 +63,8 @@ const alServiceClient = new AlServiceC(apiEndpoint, name, version, aimsCreds, re
 * @param {Object} retryOptions(optional) - Retry Options.
 
 ```javascript
-const alIngestClient = new IngestC(apiEndpoint, aimsCreds, functionType, retryOption);```
+const alIngestClient = new IngestC(apiEndpoint, aimsCreds, functionType, retryOption);
+```
 
 ## AzcollectC
 * @param {string} apiEndpoint - Alert Logic API hostname
@@ -72,7 +76,8 @@ const alIngestClient = new IngestC(apiEndpoint, aimsCreds, functionType, retryOp
 * @param {Object} retryOptions(optional) - Retry Options.
 
 ```javascript
-const azCollectClient = new AzcollectC(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed, retryOptions); ```
+const azCollectClient = new AzcollectC(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed, retryOptions);
+```
 
 ## EndpointsC
 * @param {string} apiEndpoint - Alert Logic API hostname.
@@ -82,7 +87,8 @@ const azCollectClient = new AzcollectC(apiEndpoint, aimsCreds, collectorType, se
 * @param {Object} retryOptions(optional) - Retry Options.
 
 ```javascript
-const alEndpointsClient = EndpointsC(apiEndpoint, aimsCreds, retryOption);```
+const alEndpointsClient = EndpointsC(apiEndpoint, aimsCreds, retryOption);
+```
 
 ## AlLog
 *  @param hostId - host uuid obtained at collector registration
