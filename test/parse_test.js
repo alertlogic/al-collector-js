@@ -136,6 +136,20 @@ describe('Common parse functions unit tests.', function() {
         done();
     });
     
+    it('iteratePropPaths zero key', function(done) {
+        const testPaths = [
+            { path: ['time']},
+            { path: ['some']}
+        ];
+        const testObj = {
+            some: 'value',
+            time: 0
+        };
+        assert.deepEqual(parse.iteratePropPaths(testPaths, testObj), 0);
+        
+        done();
+    });
+
     it('Test override values', function(done) {
         const testPaths = [
             { path: ['eventTimestamp'] },

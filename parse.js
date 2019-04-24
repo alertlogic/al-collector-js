@@ -64,7 +64,7 @@ var parseTsUsec = function(ts) {
 
 var iteratePropPaths = function(paths, msg) {
     return paths.reduce(function(acc, v) {
-        if (acc) {
+        if (acc || acc === 0) {
             return acc;
         } else {
             const propVal = getProp(v.path, msg);
