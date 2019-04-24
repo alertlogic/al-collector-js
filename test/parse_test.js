@@ -200,6 +200,23 @@ describe('Common parse functions unit tests.', function() {
         done();
     });
 
+    it('Gets the type ID successfully if zero', function(done){
+        const testPaths = [
+            { path: ['typeId'] },
+            { path: ['some'] }
+        ];
+        const testObj = {
+            typeId: 0,
+            some: 'some value'
+        };
+
+        const parsedType = parse.getMsgTypeId(testObj, testPaths);
+
+        assert.deepEqual(parsedType, 0);
+
+        done();
+    });
+
     it('Gets the type ID successfully', function(done){
         const testPaths = [
             { path: ['typeId'] }

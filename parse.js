@@ -84,7 +84,7 @@ var getMsgTs = function(msg, tsPaths) {
 
 var getMsgTypeId = function(msg, typeIdPaths, defaultVal = null) {
     var msgType = iteratePropPaths(typeIdPaths, msg);
-    return msgType ? msgType : defaultVal;
+    return msgType || msgType === 0 ? msgType : defaultVal;
 };
 
 module.exports = {
