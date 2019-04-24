@@ -42,6 +42,21 @@ describe('Common parse functions unit tests.', function() {
         
         done();
     });
+
+    it('Zero at key', function(done) {
+        var privGetProp = parseWire.__get__('getProp');
+        var obj = {
+            a: {
+                aa: 1,
+                ab: 2
+            },
+            b: 0,
+            c: 3
+        };
+        assert.equal(privGetProp(['b'], obj), 0);
+        
+        done();
+    });
     
     it('Empty path', function(done) {
         var privGetProp = parseWire.__get__('getProp');
