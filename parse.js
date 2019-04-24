@@ -18,7 +18,7 @@ const ISO8601_MICROSEC_OFFSET = 20;
 
 var getProp = function(path, obj, defaultVal = null) {
     var reduceFun = function(xs, x) {
-        return (xs && xs[x]) ? xs[x] : defaultVal;
+        return (xs && (xs[x] || xs[x] === 0)) ? xs[x] : defaultVal;
     };
     return path.reduce(reduceFun, obj);
 };
