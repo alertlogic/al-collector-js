@@ -202,10 +202,12 @@ describe('Common parse functions unit tests.', function() {
 
     it('Gets the type ID successfully if zero', function(done){
         const testPaths = [
-            { path: ['typeId'] }
+            { path: ['typeId'] },
+            { path: ['some'] }
         ];
         const testObj = {
-            typeId: 0
+            typeId: 0,
+            some: 'some value'
         };
 
         const parsedType = parse.getMsgTypeId(testObj, testPaths);
