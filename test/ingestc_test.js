@@ -69,7 +69,7 @@ describe('Unit Tests', function() {
             fakePost = sinon.stub(m_servicec.AlServiceC.prototype, 'post').callsFake(
                 function fakeFn(path, extraOptions) {
                     assert.equal(extraOptions.headers['Content-Type'], 'alertlogic.com/lm3-protobuf');
-                    assert.equal(path, '/data/aicspmsgs');
+                    assert.equal(path, '/data/logmsgs');
 
                     done();
                 });
