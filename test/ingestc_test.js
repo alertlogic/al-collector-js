@@ -68,7 +68,7 @@ describe('Unit Tests', function() {
         it('Verify aicspmsgs body', function(done) {
             fakePost = sinon.stub(m_servicec.AlServiceC.prototype, 'post').callsFake(
                 function fakeFn(path, extraOptions) {
-                    assert.equal(extraOptions.headers['Content-Type'], 'alertlogic.com/pass-through');
+                    assert.equal(extraOptions.headers['Content-Type'], 'alertlogic.com/lm3-protobuf');
                     assert.equal(path, '/data/aicspmsgs');
 
                     done();
