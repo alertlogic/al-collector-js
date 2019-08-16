@@ -205,6 +205,7 @@ class IngestC extends AlServiceC {
             },
             body : data
         };
+        console.log("Sending data directly to ingest");
         return this.post(`/data/logmsgs`, payload);
     }
 }
