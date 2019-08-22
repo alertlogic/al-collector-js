@@ -16,7 +16,7 @@ const commonProtoPb = require('./proto/common_proto.piqi_pb').common_proto;
 const dictPb = require('./proto/dict.piqi_pb').alc_dict;
 const hostMetadataPb = require('./proto/host_metadata.piqi_pb').host_metadata;
 
-const PAYLOAD_BATCH_SIZE = 700000;
+const PAYLOAD_BATCH_SIZE = 10000000;
 
 /**
  *  @function builds incoming log messages into protobuf and compresses it. The payload returned is 
