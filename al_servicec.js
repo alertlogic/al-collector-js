@@ -207,6 +207,21 @@ class IngestC extends AlServiceC {
         };
         return this.post(`/data/logmsgs`, payload);
     }
+    
+    sendLogmsgs(data) {
+        'use strict';
+        let payload = {
+            json : false,
+            headers : {
+                'Content-Type': 'alertlogic.com/lm3-protobuf',
+                'x-invoked-by' : this._functionType,
+                'Content-Encoding' : 'deflate',
+                'Content-Length' : Buffer.byteLength(data)
+            },
+            body : data
+        };
+        return this.post(`/data/logmsgs`, payload);
+    }
 }
 
 /**
