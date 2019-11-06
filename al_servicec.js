@@ -7,6 +7,7 @@
  * @end
  * -----------------------------------------------------------------------------
  */
+'use strict';
 
 const debug = require('debug')('al_servicec');
 const fs = require('fs');
@@ -30,7 +31,6 @@ const TOKEN_EXPIRATION_SAFE_PERIOD = 600; //10 minutes
  */
 class AimsC extends m_alUtil.RestServiceClient {
     constructor(apiEndpoint, aimsCreds, cacheDir, retryOptions) {
-        'use strict';
         super(apiEndpoint, retryOptions);
         this._cid = null;
         this._aimsAuth = {
@@ -43,7 +43,6 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _makeAuthRequest() {
-        'use strict';
         if (this._isTokenMemCached()) {
             return Promise.race([this._aimsResponse]);
         }
@@ -60,13 +59,11 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _isTokenExpired(aimsToken) {
-        'use strict';
         return aimsToken.authentication.token_expiration <=
                (Date.now()/1000 + TOKEN_EXPIRATION_SAFE_PERIOD);
     }
 
     _isTokenMemCached() {
-        'use strict';
         if (this._aimsResponse) {
             return !this._isTokenExpired(this._aimsResponse);
         } else {
@@ -75,7 +72,6 @@ class AimsC extends m_alUtil.RestServiceClient {
     }
 
     _isTokenFileCached() {
-        'use strict';
         var filename = this._tokenCacheFile;
         try {
             var fileContent = fs.readFileSync(filename);
@@ -122,14 +118,12 @@ class AimsC extends m_alUtil.RestServiceClient {
  */
 class AlServiceC extends m_alUtil.RestServiceClient {
     constructor(apiEndpoint, name, version, aimsCreds, retryOptions) {
-        'use strict';
         super(apiEndpoint, retryOptions);
         this._url = this._url + '/' + name + '/' + version;
         this._aimsc = aimsCreds;
     }
 
     request(method, path, extraOptions) {
-        'use strict';
         return this._aimsc.authenticate()
             .then(resp => {
                 const newOptions = Object.assign({}, extraOptions);
@@ -158,13 +152,11 @@ class AlServiceC extends m_alUtil.RestServiceClient {
  */
 class IngestC extends AlServiceC {
     constructor(apiEndpoint, aimsCreds, functionType, retryOptions) {
-        'use strict';
         super(apiEndpoint, 'ingest', 'v1', aimsCreds, retryOptions);
         this._functionType = functionType ? functionType : 'lambda_function';
     }
 
     sendSecmsgs(data) {
-        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -179,7 +171,6 @@ class IngestC extends AlServiceC {
     }
 
     sendVpcFlow(data) {
-        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -194,7 +185,6 @@ class IngestC extends AlServiceC {
     }
     
     sendAicspmsgs(data) {
-        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -209,7 +199,6 @@ class IngestC extends AlServiceC {
     }
     
     sendLogmsgs(data) {
-        'use strict';
         let payload = {
             json : false,
             headers : {
@@ -237,11 +226,9 @@ class IngestC extends AlServiceC {
  */
 class EndpointsC extends AlServiceC {
     constructor(apiEndpoint, aimsCreds, retryOptions) {
-        'use strict';
         super(apiEndpoint, 'endpoints', 'v1', aimsCreds, retryOptions);
     }
     getEndpoint(serviceName, residency) {
-        'use strict';
         return this.get(`/residency/${residency}/services/${serviceName}/endpoint`, {});
     }
 }
