@@ -15,7 +15,8 @@ const COLLECTOR_TYPES = {
     CWE: 'cwe',
     CWL: 'cwl',
     O365: 'o365',
-    EHUB: 'ehub'
+    EHUB: 'ehub',
+    PAWS: 'paws'
 };
 
 const CLOUD_TYPES = {
@@ -43,6 +44,7 @@ class AzcollectC extends AlServiceC {
         switch (collectorType){
             case COLLECTOR_TYPES.CWE:
             case COLLECTOR_TYPES.CWL:
+            case COLLECTOR_TYPES.PAWS:
                 this._collectorType = collectorType;
                 this._cloudType = CLOUD_TYPES.AWS;
                 break;
