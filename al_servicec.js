@@ -30,9 +30,9 @@ const TOKEN_EXPIRATION_SAFE_PERIOD = 600; //10 minutes
  *
  */
 class AimsC extends m_alUtil.RestServiceClient {
-    constructor(apiEndpoint, aimsCreds, cacheDir, retryOptions) {
+    constructor(apiEndpoint, aimsCreds, cacheDir, retryOptions, cid) {
         super(apiEndpoint, retryOptions);
-        this._cid = null;
+        this._cid = cid;
         this._aimsAuth = {
             user: aimsCreds.access_key_id,
             password: aimsCreds.secret_key
@@ -51,7 +51,7 @@ class AimsC extends m_alUtil.RestServiceClient {
         }
         return super.post('/aims/v1/authenticate', {auth: this._aimsAuth})
             .then(resp => {
-                this._cid = resp.authentication.account.id;
+                this._cid = this._cid ? this._cid : resp.authentication.account.id;
                 this._aimsResponse = resp;
                 fs.writeFileSync(this._tokenCacheFile, JSON.stringify(resp));
                 return resp;
@@ -79,7 +79,7 @@ class AimsC extends m_alUtil.RestServiceClient {
             if (this._isTokenExpired(tokenJson)) {
                 return false;
             } else {
-                this._cid = tokenJson.authentication.account.id;
+                this._cid = this._cid ? this._cid : tokenJson.authentication.account.id;
                 this._aimsResponse = tokenJson;
                 return true;
             }
@@ -96,7 +96,7 @@ class AimsC extends m_alUtil.RestServiceClient {
     get cid() {
         return this._cid;
     }
-
+    
     authenticate() {
         return this._makeAuthRequest();
     }

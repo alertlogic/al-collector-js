@@ -110,6 +110,35 @@ describe('Unit Tests', function() {
             });
         });
 
+        it('CID override, mem cache: test 1) it is used 2) it is renewed after token is expired', function(done) {
+            let testCid = 4321;
+            var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS, null, null, testCid);
+            assert_cache(aimsc, false, false);
+            assert.equal(aimsc.cid, testCid);
+            aimsc.authenticate()
+            .then(() => {
+                sinon.assert.calledWith(fakeRest,
+                    '/aims/v1/authenticate', m_alMock.AIMS_AUTH
+                );
+                tk.travel(BEFORE_EXPIRED);
+                assert_cache(aimsc, true, true);
+                assert.equal(aimsc.cid, testCid);
+                aimsc.authenticate()
+                .then(() => {
+                    sinon.assert.callCount(fakeRest, 1);
+                    tk.travel(AFTER_EXPIRED);
+                    assert_cache(aimsc, false, false);
+                    assert.equal(aimsc.cid, testCid);
+                    aimsc.authenticate()
+                    .then(() => {
+                        sinon.assert.callCount(fakeRest, 2);
+                        assert_cache(aimsc, true, true);
+                        assert.equal(aimsc.cid, testCid);
+                        done();
+                    });
+                });
+            });
+        });
 
         it('file cache: test 1) it is used 2) it is renewed after token is expired', function(done) {
             var aimsc1 = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
@@ -148,6 +177,45 @@ describe('Unit Tests', function() {
             });
         });
 
+        it('CID override, file cache: test 1) it is used 2) it is renewed after token is expired', function(done) {
+            let testCid = 4321;
+            var aimsc1 = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS, null, null, testCid);
+            assert_cache(aimsc1, false, false);
+            assert.equal(aimsc1.cid, testCid);
+            aimsc1.authenticate()
+            .then(() => {
+                sinon.assert.calledWith(fakeRest,
+                    '/aims/v1/authenticate', m_alMock.AIMS_AUTH
+                );
+                tk.travel(BEFORE_EXPIRED);
+                var aimsc2 = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS, null, null, testCid);
+                assert_cache(aimsc1, true, true);
+                assert_cache(aimsc2, false, true);
+                assert.equal(aimsc1.cid, testCid);
+                assert.equal(aimsc2.cid, testCid);
+                aimsc2.authenticate()
+                .then(() => {
+                    sinon.assert.callCount(fakeRest, 1);
+                    assert_cache(aimsc2, true, true);
+                    assert.equal(aimsc2.cid, testCid);
+                    tk.travel(AFTER_EXPIRED);
+                    var aimsc3 = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS, null, null, testCid);
+                    assert_cache(aimsc2, false, false);
+                    assert_cache(aimsc3, false, false);
+                    assert.equal(aimsc3.cid, testCid);
+                    aimsc3.authenticate()
+                    .then(() => {
+                        sinon.assert.callCount(fakeRest, 2);
+                        assert_cache(aimsc2, false, true);
+                        assert_cache(aimsc3, true, true);
+                        assert.equal(aimsc3.cid, testCid);
+                        done();
+                    });
+                });
+            });
+        });
+
+        
         it('file cache: test case when cache file is broken', function(done) {
             assert_file_cache_absent(m_alMock.CACHE_FILENAME);
             var aimsc1 = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
@@ -167,6 +235,29 @@ describe('Unit Tests', function() {
                     assert_cache(aimsc2, true, true);
                     done();
                 });
+            });
+        });
+        
+        it('No override cid', function(done) {
+            assert_file_cache_absent(m_alMock.CACHE_FILENAME);
+            var aimsc1= new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            assert_cache(aimsc1, false, false);
+            aimsc1.authenticate()
+            .then(() => {
+                assert.equal(aimsc1._cid, m_alMock.CID);
+                done();
+            });
+        });
+        
+        it('Override cid', function(done) {
+            assert_file_cache_absent(m_alMock.CACHE_FILENAME);
+            const testCid = 4321;
+            var aimsc1= new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS, null, null, testCid);
+            assert_cache(aimsc1, false, false);
+            aimsc1.authenticate()
+            .then(() => {
+                assert.equal(aimsc1._cid, testCid);
+                done();
             });
         });
 
