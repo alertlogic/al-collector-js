@@ -22,6 +22,9 @@ clean:
 	rm -f test/report.xml
 	rm -rf ./coverage/
 
+publish:
+	npm run publish
+
 pb: $(PROTO_DIR)
 	cd $(PROTO_DIR) && make compile
 
