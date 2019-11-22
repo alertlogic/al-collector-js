@@ -1,6 +1,6 @@
 {
   "name": "@alertlogic/al-collector-js",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
