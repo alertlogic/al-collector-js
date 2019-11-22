@@ -61,6 +61,7 @@ describe('Unit Tests', function() {
         });
 
         it('Too many messages ', function(done) {
+            this.timeout(5000);
             var hostTypeElem = {
                 key: 'host_type',
                 value: {str: 'azure_fun'}
