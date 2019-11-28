@@ -96,15 +96,10 @@ class AzcollectC extends AlServiceC {
 
     _doRegistrationAws(registrationValues) {
         'use strict';
-        let regBody = Object.assign({
-             cf_stack_name : registrationValues.stackName,
-             version : registrationValues.version,
-             data_type : registrationValues.dataType ? registrationValues.dataType : 'secmsgs'
-        }, registrationValues.custom_fields);
         const type = this._collectorType;
         var functionName = encodeURIComponent(registrationValues.functionName);
         return this.post(`/aws/${type}/` +
-            `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: regBody});
+            `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: registrationValues});
     }
 
      _doDeregistrationAws(registrationValues) {

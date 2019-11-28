@@ -1,6 +1,6 @@
 {
   "name": "@alertlogic/al-collector-js",
-  "version": "1.3.4",
+  "version": "1.4.0",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "jshint --show-non-errors --exclude \"./node_modules/*,./proto/*\" **/*.js *.js",
     "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura mocha --colors --reporter mocha-jenkins-reporter",
-    "publish": "npm publish --access=public"
+    "rel": "npm publish --access=public"
   },
   "main": "index.js",
   "maintainers": [
