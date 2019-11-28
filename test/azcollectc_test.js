@@ -63,19 +63,23 @@ describe('Unit Tests', function() {
                 functionName : 'test-function',
                 region : 'us-east-1',
                 version : '1.0.0',
-                stackName : 'test-stack'
-                
+                stackName : 'test-stack',
+                cf_stack_name: "test-stack",
+                data_type: "secmsgs"
             };
             azc.register(checkinValues).then( resp => {
                 sinon.assert.calledWith(fakePost, '/aws/cwe/1234567890/us-east-1/test-function',
                     { 
                         body: {
-                            cf_stack_name: 'test-stack',
-                            data_type: 'secmsgs',
-                            version: '1.0.0'
+                            awsAccountId: "1234567890",
+                            cf_stack_name: "test-stack",
+                            data_type: "secmsgs",
+                            functionName: "test-function",
+                            region: "us-east-1",
+                            stackName: "test-stack",
+                            version: "1.0.0"
                         }
                     });
-                
                 done();
             });
         });
@@ -97,15 +101,51 @@ describe('Unit Tests', function() {
                 sinon.assert.calledWith(fakePost, '/aws/cwl/1234567890/us-east-1/test-function',
                     { 
                         body: {
-                            cf_stack_name: 'test-stack',
-                            data_type: 'vpcflow',
-                            version: '1.0.0'
+                            awsAccountId: "1234567890",
+                            dataType: "vpcflow",
+                            functionName: "test-function",
+                            region: "us-east-1",
+                            stackName: "test-stack",
+                            version: "1.0.0"
                         }
                     });
                 done();
             });
         });
-        
+
+        it('AWS register with custom_fields', function(done) {
+            var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwl');
+            
+            const checkinValues = {
+                awsAccountId : '1234567890',
+                functionName : 'test-function',
+                region : 'us-east-1',
+                version : '1.0.0',
+                stackName : 'test-stack',
+                dataType: 'vpcflow',
+                custom_fields: {
+                    some: 'custom_field'
+                }
+                
+            };
+            azc.register(checkinValues).then( resp => {
+                sinon.assert.calledWith(fakePost, '/aws/cwl/1234567890/us-east-1/test-function',
+                    { 
+                        body: {
+                            awsAccountId: "1234567890",
+                            custom_fields: { some: "custom_field" },
+                            dataType: "vpcflow",
+                            functionName: "test-function",
+                            region: "us-east-1",
+                            stackName: "test-stack",
+                            version: "1.0.0"
+                        }
+                    });
+                done();
+            });
+        });
+
         it('AWS deregister', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
