@@ -23,7 +23,7 @@ clean:
 	rm -rf ./coverage/
 
 publish:
-	npm run publish
+	npm run rel
 
 pb: $(PROTO_DIR)
 	cd $(PROTO_DIR) && make compile
