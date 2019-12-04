@@ -70,6 +70,9 @@ const AZURE_CHECKIN_VALUES = {
 
 const AZCOLLECT_CHECKIN_QUERY = {
     body : {
+        awsAccountId: '1234567890',
+        functionName: 'test-function',
+        region: 'us-east-1',
         version: '1.0.0',
         status: 'ok',
         error_code: undefined,
