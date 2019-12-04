@@ -80,18 +80,11 @@ class AzcollectC extends AlServiceC {
 
     _doCheckinAws(checkinValues) {
         'use strict';
-        let checkinBody = {
-            version : checkinValues.version,
-            status : checkinValues.status,
-            error_code : checkinValues.error_code,
-            details : checkinValues.details,
-            statistics : checkinValues.statistics
-        };
         const type = this._collectorType;
         var functionName = encodeURIComponent(checkinValues.functionName);
         var checkinUrl = `/aws/${type}/checkin/${checkinValues.awsAccountId}/` +
                          `${checkinValues.region}/${functionName}`;
-        return this._doSendCheckin(checkinUrl, checkinBody);
+        return this._doSendCheckin(checkinUrl, checkinValues);
     }
 
     _doRegistrationAws(registrationValues) {
