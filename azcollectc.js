@@ -100,7 +100,7 @@ class AzcollectC extends AlServiceC {
          const type = this._collectorType;
          var functionName = encodeURIComponent(registrationValues.functionName);
          return this.deleteRequest(`/aws/${type}/` +
-             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`);
+             `${registrationValues.awsAccountId}/${registrationValues.region}/${functionName}`, {body: registrationValues});
      }
     
     _doCheckinAzure(checkinInput) {
