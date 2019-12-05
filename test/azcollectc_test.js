@@ -156,7 +156,10 @@ describe('Unit Tests', function() {
             };
             
             azc.deregister(checkinValues).then( resp => {
-                sinon.assert.calledWith(fakeDel, '/aws/cwe/1234567890/us-east-1/test-function');
+                sinon.assert.calledWith(fakeDel, '/aws/cwe/1234567890/us-east-1/test-function',
+                    { 
+                        body: checkinValues
+                    });
                 done();
             });
         });
