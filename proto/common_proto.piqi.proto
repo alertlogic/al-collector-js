@@ -38,6 +38,7 @@ message collected_message {
     required string message_type = 7;
     optional string message_type_id = 8;
     optional fixed32 message_ts_us = 9;
+    optional string application_id = 10;
 }
 
 message collected_batch {
