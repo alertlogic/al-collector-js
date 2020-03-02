@@ -46,7 +46,8 @@ const PAYLOAD_BATCH_SIZE = 10000000;
  *      message: 'some message string',
  *      messageType: 'json/azure.o365',
  *      messageTypeId: 'AzureActiveDirectory',
- *      messageTsUs: undefined
+ *      messageTsUs: undefined,
+ *      applicationId: 'o365'
  *  };
  *  Consult 'collected_message' definition in proto/common_proto.piqi.proto
  *  @param callback
@@ -181,7 +182,8 @@ function buildHostmeta(hostId, hostmetaElems, callback) {
  *      message: 'some message string',
  *      messageType: 'json/azure.o365',
  *      messageTypeId: 'AzureActiveDirectory',
- *      messageTsUs: undefined
+ *      messageTsUs: undefined,
+ *      applicationId: 'o365'
  *  };
  *  Consult 'collected_message' definition in proto/common_proto.piqi.proto
  * @param callback

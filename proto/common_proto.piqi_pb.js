@@ -911,6 +911,7 @@ $root.common_proto = (function() {
          * @property {string} messageType collected_message messageType
          * @property {string|null} [messageTypeId] collected_message messageTypeId
          * @property {number|null} [messageTsUs] collected_message messageTsUs
+         * @property {string|null} [applicationId] collected_message applicationId
          */
 
         /**
@@ -1001,6 +1002,14 @@ $root.common_proto = (function() {
         collected_message.prototype.messageTsUs = 0;
 
         /**
+         * collected_message applicationId.
+         * @member {string} applicationId
+         * @memberof common_proto.collected_message
+         * @instance
+         */
+        collected_message.prototype.applicationId = "";
+
+        /**
          * Creates a new collected_message instance using the specified properties.
          * @function create
          * @memberof common_proto.collected_message
@@ -1038,6 +1047,8 @@ $root.common_proto = (function() {
                 writer.uint32(/* id 8, wireType 2 =*/66).string(message.messageTypeId);
             if (message.messageTsUs != null && message.hasOwnProperty("messageTsUs"))
                 writer.uint32(/* id 9, wireType 5 =*/77).fixed32(message.messageTsUs);
+            if (message.applicationId != null && message.hasOwnProperty("applicationId"))
+                writer.uint32(/* id 10, wireType 2 =*/82).string(message.applicationId);
             return writer;
         };
 
@@ -1098,6 +1109,9 @@ $root.common_proto = (function() {
                     break;
                 case 9:
                     message.messageTsUs = reader.fixed32();
+                    break;
+                case 10:
+                    message.applicationId = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1165,6 +1179,9 @@ $root.common_proto = (function() {
             if (message.messageTsUs != null && message.hasOwnProperty("messageTsUs"))
                 if (!$util.isInteger(message.messageTsUs))
                     return "messageTsUs: integer expected";
+            if (message.applicationId != null && message.hasOwnProperty("applicationId"))
+                if (!$util.isString(message.applicationId))
+                    return "applicationId: string expected";
             return null;
         };
 
@@ -1212,6 +1229,8 @@ $root.common_proto = (function() {
                 message.messageTypeId = String(object.messageTypeId);
             if (object.messageTsUs != null)
                 message.messageTsUs = object.messageTsUs >>> 0;
+            if (object.applicationId != null)
+                message.applicationId = String(object.applicationId);
             return message;
         };
 
@@ -1246,6 +1265,7 @@ $root.common_proto = (function() {
                 object.messageType = "";
                 object.messageTypeId = "";
                 object.messageTsUs = 0;
+                object.applicationId = "";
             }
             if (message.hostname != null && message.hasOwnProperty("hostname"))
                 object.hostname = message.hostname;
@@ -1271,6 +1291,8 @@ $root.common_proto = (function() {
                 object.messageTypeId = message.messageTypeId;
             if (message.messageTsUs != null && message.hasOwnProperty("messageTsUs"))
                 object.messageTsUs = message.messageTsUs;
+            if (message.applicationId != null && message.hasOwnProperty("applicationId"))
+                object.applicationId = message.applicationId;
             return object;
         };
 
