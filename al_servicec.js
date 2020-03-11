@@ -141,80 +141,6 @@ class AlServiceC extends m_alUtil.RestServiceClient {
 
 /**
  * @class
- * HTTPS client for Alert Logic Ingest service.
- *
- * @constructor
- * @param {string} apiEndpoint - Alert Logic API hostname.
- * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
- * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
- * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
- *
- */
-class IngestC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds, functionType, retryOptions) {
-        super(apiEndpoint, 'ingest', 'v1', aimsCreds, retryOptions);
-        this._functionType = functionType ? functionType : 'lambda_function';
-    }
-
-    sendSecmsgs(data) {
-        let payload = {
-            json : false,
-            headers : {
-                'Content-Type': 'alertlogic.com/cwe-json',
-                'x-invoked-by' : this._functionType,
-                'Content-Encoding' : 'deflate',
-                'Content-Length' : Buffer.byteLength(data)
-            },
-            body : data
-        };
-        return this.post(`/data/secmsgs`, payload);
-    }
-
-    sendVpcFlow(data) {
-        let payload = {
-            json : false,
-            headers : {
-                'Content-Type': 'alertlogic.com/cwl-json',
-                'x-invoked-by' : this._functionType,
-                'Content-Encoding' : 'deflate',
-                'Content-Length' : Buffer.byteLength(data)
-            },
-            body : data
-        };
-        return this.post(`/data/vpcflow`, payload);
-    }
-    
-    sendAicspmsgs(data) {
-        let payload = {
-            json : false,
-            headers : {
-                'Content-Type': 'alertlogic.com/lm3-protobuf',
-                'x-invoked-by' : this._functionType,
-                'Content-Encoding' : 'deflate',
-                'Content-Length' : Buffer.byteLength(data)
-            },
-            body : data
-        };
-        return this.post(`/data/logmsgs`, payload);
-    }
-    
-    sendLogmsgs(data) {
-        let payload = {
-            json : false,
-            headers : {
-                'Content-Type': 'alertlogic.com/lm3-protobuf',
-                'x-invoked-by' : this._functionType,
-                'Content-Encoding' : 'deflate',
-                'Content-Length' : Buffer.byteLength(data)
-            },
-            body : data
-        };
-        return this.post(`/data/logmsgs`, payload);
-    }
-}
-
-/**
- * @class
  * HTTPS client for Alert Logic Endpoints service.
  *
  * @constructor
@@ -237,7 +163,6 @@ class EndpointsC extends AlServiceC {
 module.exports = {
     AlServiceC: AlServiceC,
     AimsC: AimsC,
-    IngestC: IngestC,
     EndpointsC: EndpointsC
 };
 
