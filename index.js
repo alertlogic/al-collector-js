@@ -15,6 +15,7 @@ module.exports = {
     AzcollectC : require('./azcollectc').AzcollectC,
     EndpointsC : require('./al_servicec').EndpointsC,
     AlLog : require('./al_log'),
-    Parse: require('./parse')
+    Parse: require('./parse'),
+    RestServiceClient: require('./al_util').RestServiceClient
 };
 
