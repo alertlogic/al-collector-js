@@ -1,6 +1,7 @@
 # al-collector-js
 
-[![Build Status](https://secure.travis-ci.org/alertlogic/al-collector-js.png?branch=master)](http://travis-ci.org/alertlogic/al-collector-js)
+[![Build Status](https://secure.travis-ci.org/alertlogic/al-collector-js.png?branch=master)](http://travis-ci.org/alertlogic/al-collector-js) ![ALPS build](https://ci.pipelineservices.alertlogic.com/v1/badges/alertlogic/al-collector-js/npm)
+
 
 Alert Logic cloud collector common library.
 
