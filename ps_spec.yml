@@ -1,4 +1,4 @@
-iversion: 1.0
+version: 1.0
 service_name: al-collector-js
 
 stages:
