@@ -56,7 +56,7 @@ describe('Unit Tests', function() {
         
         it('AWS register no data type', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'cwe');
             
             const checkinValues = {
                 awsAccountId : '1234567890',
@@ -86,7 +86,7 @@ describe('Unit Tests', function() {
         
         it('AWS register with data type', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwl');
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'cwl');
             
             const checkinValues = {
                 awsAccountId : '1234567890',
@@ -115,7 +115,7 @@ describe('Unit Tests', function() {
 
         it('AWS register with custom_fields', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwl');
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'cwl');
             
             const checkinValues = {
                 awsAccountId : '1234567890',
@@ -148,7 +148,7 @@ describe('Unit Tests', function() {
 
         it('AWS deregister', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe');
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'cwe');
             const checkinValues = {
                 awsAccountId : '1234567890',
                 functionName : 'test-function',
@@ -166,7 +166,7 @@ describe('Unit Tests', function() {
         
         it('AWS checkin (no compression)', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe', false);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'cwe', false);
             azc.checkin(m_alMock.AWS_CHECKIN).then( resp => {
                 sinon.assert.calledWith(
                     fakePost,
@@ -179,7 +179,7 @@ describe('Unit Tests', function() {
 
         it('AWS checkin (with compression)', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'cwe', true);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'cwe', true);
             azc.checkin(m_alMock.AWS_CHECKIN).then( resp => {
                 sinon.assert.calledWith(
                     fakePost,
@@ -207,6 +207,7 @@ describe('Unit Tests', function() {
             
             fakePost = sinon.stub(AzcollectC.prototype, 'post').callsFake(
                 function fakeFn(path, options) {
+                    console.log('!!!!FAKE POST', path);
                     return new Promise(function(resolve, reject) {
                         resolve('ok');
                     });
@@ -231,7 +232,8 @@ describe('Unit Tests', function() {
         
         it('Azure register', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'o365');
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'azure', 'o365');
+            //console.log('!!!!', azc);
             var expectedRegisterBody = {
                 body: {
                     app_tenant_id: 'azure-tenant-id',
@@ -255,7 +257,7 @@ describe('Unit Tests', function() {
         
         it('Azure deregister', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'ehub');
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'azure', 'ehub');
             const deregValues = {
                 web_app_name : 'azure-web-app-name',
                 app_tenant_id : 'azure-tenant-id',
@@ -279,7 +281,7 @@ describe('Unit Tests', function() {
                 
         it('Azure checkin (no compression)', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'ehub', false);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'azure', 'ehub', false);
             var expectedCheckinBody = {
                     body: {
                         version : '1.0.0',
@@ -301,7 +303,7 @@ describe('Unit Tests', function() {
 
         it('Azure checkin compressed', function(done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
-            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'ehub', true);
+            var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'azure', 'ehub', true);
             
             var expectedCheckin = {
                 version : '1.0.0',

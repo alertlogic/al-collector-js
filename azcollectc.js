@@ -7,22 +7,22 @@
  * @end
  * -----------------------------------------------------------------------------
  */
+'use strict';
 
 const zlib = require('zlib');
 const AlServiceC = require('./al_servicec').AlServiceC;
 
-const COLLECTOR_TYPES = {
-    CWE: 'cwe',
-    CWL: 'cwl',
-    O365: 'o365',
-    EHUB: 'ehub',
-    PAWS: 'paws'
+const CLOUD_TYPES = {
+    AWS: 'aws',
+    AZURE: 'azure'
 };
 
-const CLOUD_TYPES = {
-        AWS: 'aws',
-        Azure: 'azure'
-    };
+const DEFAULT_RETRY_OPTS = {
+    factor: 2,
+    minTimeout: 300,
+    retries: 7,
+    maxTimeout: 10000
+};
 
 /**
  * @class
@@ -31,55 +31,24 @@ const CLOUD_TYPES = {
  * @constructor
  * @param {string} apiEndpoint - Alert Logic API hostname
  * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
- * @param {string} [aimsCreds.access_key_id] - Aert Logic API access key id.
+ * @param {string} [aimsCreds.access_key_id] - Alert Logic API access key id.
  * @param {string} [aimsCreds.secret_key] - Alert Logic API secret key.
- * @param {string} collectorType - Al collector type: cwl, cwe, o365 etc
+ * @param {string} cloudType - type of cloud provider: aws, azure etc
+ * @param {string} collectorType - Alert Logic collector type: cwl, cwe, o365 etc
+ * @param {string} sendCheckinCompressed - gzip checkin body for transport. Default false.
+ * @param {Object} retryOptions - refer to retry#retrytimeoutsoptions of 'retry' npm package.
  *
  */
 class AzcollectC extends AlServiceC {
-    constructor(apiEndpoint, aimsCreds, collectorType, sendCheckinCompressed, retryOptions) {
-        'use strict';
-        super(apiEndpoint, 'azcollect', 'v1', aimsCreds, retryOptions);
+    constructor(apiEndpoint, aimsCreds, cloudType, collectorType, sendCheckinCompressed, retryOptions) {
+        const retryOpts = retryOptions ? retryOptions : DEFAULT_RETRY_OPTS;
+        super(apiEndpoint, 'azcollect', 'v1', aimsCreds, retryOpts);
         this._sendCheckinCompressed = sendCheckinCompressed ? sendCheckinCompressed : false;
-        switch (collectorType){
-            case COLLECTOR_TYPES.CWE:
-            case COLLECTOR_TYPES.CWL:
-            case COLLECTOR_TYPES.PAWS:
-                this._collectorType = collectorType;
-                this._cloudType = CLOUD_TYPES.AWS;
-                break;
-            case COLLECTOR_TYPES.O365:
-            case COLLECTOR_TYPES.EHUB:
-                this._collectorType = collectorType;
-                this._cloudType = CLOUD_TYPES.AZURE;
-                break;
-            default:
-                // Keep for backward compatibility
-                this._collectorType = COLLECTOR_TYPES.CWE;
-                this._cloudType = CLOUD_TYPES.AWS;
-                break;
-                // TODO: Should have exception here when cwe-collector is migrated
-                // throw `Unknown collector type: ${collectorType}`;
-        }
-    }
-
-    doCheckin(checkinValues) {
-        // Deprecated:
-        return this._doCheckinAws(checkinValues);
-    }
-    
-    doRegistration(registrationValues) {
-        // Deprecated:
-       return this._doRegistrationAws(registrationValues);
-    }
-
-    doDeregistration(registrationValues) {
-        // Deprecated:
-        return this._doDeregistrationAws(registrationValues);
+        this._collectorType = collectorType;
+        this._cloudType = cloudType;
     }
 
     _doCheckinAws(checkinValues) {
-        'use strict';
         const type = this._collectorType;
         var functionName = encodeURIComponent(checkinValues.functionName);
         var checkinUrl = `/aws/${type}/checkin/${checkinValues.awsAccountId}/` +
@@ -88,7 +57,6 @@ class AzcollectC extends AlServiceC {
     }
 
     _doRegistrationAws(registrationValues) {
-        'use strict';
         const type = this._collectorType;
         var functionName = encodeURIComponent(registrationValues.functionName);
         return this.post(`/aws/${type}/` +
@@ -96,7 +64,6 @@ class AzcollectC extends AlServiceC {
     }
 
      _doDeregistrationAws(registrationValues) {
-         'use strict';
          const type = this._collectorType;
          var functionName = encodeURIComponent(registrationValues.functionName);
          return this.deleteRequest(`/aws/${type}/` +
@@ -104,7 +71,6 @@ class AzcollectC extends AlServiceC {
      }
     
     _doCheckinAzure(checkinInput) {
-        'use strict';
         var checkinBody = Object.assign({}, checkinInput);
         const type = this._collectorType;
         var functionName = encodeURIComponent(checkinBody.web_app_name);
@@ -117,7 +83,6 @@ class AzcollectC extends AlServiceC {
     }
     
     _doRegistrationAzure(regInput) {
-        'use strict';
         var regBody = Object.assign({}, regInput);
         const collectorType = this._collectorType;
         const functionName = encodeURIComponent(regInput.web_app_name);
@@ -129,7 +94,6 @@ class AzcollectC extends AlServiceC {
     }
     
     _doDeregistrationAzure(deregInput) {
-        'use strict';
         var deregBody = Object.assign({}, deregInput);
         const collectorType = this._collectorType;
         var functionName = encodeURIComponent(deregBody.web_app_name);
@@ -161,7 +125,6 @@ class AzcollectC extends AlServiceC {
     }
     
     checkin(checkinValues) {
-        'use strict';
         switch(this._cloudType) {
             case CLOUD_TYPES.AWS:
                 return this._doCheckinAws(checkinValues);
@@ -173,7 +136,6 @@ class AzcollectC extends AlServiceC {
     }
     
     register(registrationValues) {
-        'use strict';
         switch(this._cloudType) {
             case CLOUD_TYPES.AWS:
                 return this._doRegistrationAws(registrationValues);
@@ -185,7 +147,6 @@ class AzcollectC extends AlServiceC {
     }
     
     deregister(registrationValues) {
-        'use strict';
         switch(this._cloudType) {
             case CLOUD_TYPES.AWS:
                 return this._doDeregistrationAws(registrationValues);
@@ -195,7 +156,6 @@ class AzcollectC extends AlServiceC {
                 break;
         }
     }
-
 }
 
 module.exports = {
