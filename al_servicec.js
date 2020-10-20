@@ -84,11 +84,13 @@ class AimsC extends m_alUtil.RestServiceClient {
                 return true;
             }
         } catch (e) {
-            if (e instanceof SyntaxError ||
-               ((e instanceof Error) && e.code !== 'ENOENT')) {
-                fs.unlinkSync(filename);
+            try {
+                if (e instanceof SyntaxError || ((e instanceof Error) && e.code !== 'ENOENT')) {
+                    fs.unlinkSync(filename);
+                }
             }
-            return false;
+            catch (err) { }
+            return false;    
         }
     }
 
