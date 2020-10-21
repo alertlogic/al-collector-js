@@ -85,16 +85,16 @@ class AimsC extends m_alUtil.RestServiceClient {
             }
         } catch (e) {
             try {
-                if (e instanceof SyntaxError || ((e instanceof Error)
-                    && e.code !== 'ENOENT'
-                    && e.code !== 'EMFILE' 
+                if (e instanceof SyntaxError || ((e instanceof Error) && 
+                e.code !== 'ENOENT' && 
+                e.code !== 'EMFILE' 
                 )) {
                     fs.unlinkSync(filename);
                 }
-                return false
+                return false;
             }
             catch (err) {
-                console.error(`Failed to unlink cache due to: ${err}, cache read failure: ${e}`);
+                console.error(`Failed to unlink cache due to: ${err}, cache read failure: ${e}, file name: ${filename}`);
                 return false;
             }
         }
