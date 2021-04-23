@@ -72,23 +72,28 @@ var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCall
         },
         function(meta, msg, callback) {
             buildBatch(sourceId, meta, msg, function(err, batch) {
-                return callback(err, batch);
+                return callback(err, batch, msg);
             });
         },
-        function(batchBuf, callback) {
+        function(batchBuf, msg, callback) {
             buildBatchList(batchBuf, function(err, batchList) {
-                return callback(err, batchList);
+                return callback(err, batchList, msg);
             });
         },
-        function(batchList, callback) {
+        function(batchList, msg, callback) {
             var batchListType = commonProtoPb.collected_batch_list;
             var buf = batchListType.encode(batchList).finish();
-            return callback(null, buf);
+            return callback(null, buf, msg);
         }],
-        function(err, result) {
+        function (err, result, msg) {
             if (err) {
                 return mainCallback(err);
             } else {
+                // calculate the actual collected Mssage byte
+                var collectedMessageBytes = 0;
+                msg.map(eachMessage => {
+                    collectedMessageBytes += eachMessage.messageLength;
+                });
                 zlib.deflate(result, function(defalteErr, compressed) {
                     if (defalteErr) {
                         return mainCallback(defalteErr);
@@ -97,7 +102,7 @@ var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCall
                         if (payloadSize > PAYLOAD_BATCH_SIZE) {
                             return mainCallback(`Maximum payload size exceeded: ${payloadSize}`, compressed);
                         } else {
-                            return mainCallback(null, compressed);
+                            return mainCallback(null, { payload: compressed, payload_size: payloadSize, raw_count: msg.length, raw_bytes: collectedMessageBytes });
                         }
                     }
                 });
@@ -198,6 +203,7 @@ function buildMessages(content, parseContentFun, callback) {
             if (err) {
                 return asyncCallback(err);
             } else {
+                buf.messageLength = buf.message.length;
                 memo.push(buf);
                 return asyncCallback(err, memo);
             }
