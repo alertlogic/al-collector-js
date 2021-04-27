@@ -54,8 +54,8 @@ describe('Unit Tests', function() {
                 return messagePayload;
             };
             var expectedPayload = 'eJzjamHi4izOLy1KTtXNTBGK5mLPyC8uATFFdm6e97ZBfLqW665Nbkkbdic+E771WoJByYJLhosvJz85MScepDQvMTdViEuKozg/NxXE5pLg4gSJx5dUFqQKcUtxJlaVFqXGp5XmSfkIHtV4Hc0ABLLcQEKJO9/YzLQ8NSkjPz/biCM3tbg4MT3V0Io/qzg/Tx+sTQ+kwknEEcR2TC7JLEt1ySxKTS7JL6okzjQjIk0DAFuCVYc=';
-            alLog.buildPayload('host-id', 'source-id', hml, msgs, parseFun, function(err, payload){
-                assert.equal(expectedPayload, payload.toString('base64'));
+            alLog.buildPayload('host-id', 'source-id', hml, msgs, parseFun, function(err, payloadObject){
+                assert.equal(expectedPayload, payloadObject.payload.toString('base64'));
                 return done();
             });
         });
