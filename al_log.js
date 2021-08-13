@@ -3,7 +3,7 @@
  * @doc
  *
  * Helper utilities for  Alert Logic log collector.
- * NOT: parametersto all function are passed as (object, callback)
+ * NOT: parameters to all functions are passed as (object, callback)
  *
  * @end
  * -----------------------------------------------------------------------------
