@@ -207,7 +207,6 @@ describe('Unit Tests', function() {
             
             fakePost = sinon.stub(AzcollectC.prototype, 'post').callsFake(
                 function fakeFn(path, options) {
-                    console.log('!!!!FAKE POST', path);
                     return new Promise(function(resolve, reject) {
                         resolve('ok');
                     });

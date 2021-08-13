@@ -3,6 +3,7 @@
  * @doc
  *
  * Helper utilities for  Alert Logic log collector.
+ * NOT: parametersto all function are passed as (object, callback)
  *
  * @end
  * -----------------------------------------------------------------------------
@@ -11,6 +12,7 @@ const crypto = require('crypto');
 const async = require('async');
 const zlib = require('zlib');
 
+const alLogFilter = require('./al_log_filter');
 const alcHealthPb = require('./proto/alc_health.piqi_pb').alc_health;
 const commonProtoPb = require('./proto/common_proto.piqi_pb').common_proto;
 const dictPb = require('./proto/dict.piqi_pb').alc_dict;
@@ -50,6 +52,11 @@ const PAYLOAD_BATCH_SIZE = 10000000;
  *      applicationId: 'o365'
  *  };
  *  Consult 'collected_message' definition in proto/common_proto.piqi.proto
+ *  @param filterJson - JSON parsed object representing key-value pairs which 
+ *  should exist in a message. For example, {type: 'Security', category: 'Admin'}.
+ *  NOTE: do NOT use json filter if 'content' is an array of strings.
+ *  @param filterRegexp - regexp object filter. If content messages are JSON object
+ *  then regexp filter if applied to a stringified message value.
  *  @param callback
  *  
  *  @return callback - (error, builtPayload, payloadSize)
@@ -58,39 +65,55 @@ const PAYLOAD_BATCH_SIZE = 10000000;
  *  For an AWS Lambda via kinesis trigger batch size configuration.
  */
 
-var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCallback, mainCallback) {
+var buildPayload = function ({hostId, sourceId, hostmetaElems, content, parseCallback, filterJson, filterRegexp}, mainCallback) {
     async.waterfall([
         function(callback) {
-            buildMessages(content, parseCallback, function(err, msg) {
+            const params = {
+                content: content,
+                parseContentFun: parseCallback
+            };
+            buildMessages(params, function(err, msg) {
                 return callback(err, msg);
             });
         },
         function(msg, callback) {
-            buildHostmeta(hostId, hostmetaElems, function(err, meta) {
+            const params = {
+                hostId: hostId,
+                hostmetaElems: hostmetaElems
+            };
+            buildHostmeta(params, function(err, meta) {
                 return callback(err, meta, msg);
             });
         },
         function(meta, msg, callback) {
-            buildBatch(sourceId, meta, msg, function(err, batch) {
+            const params = {
+                sId: sourceId,
+                metadata: meta,
+                messages:msg
+            };
+            buildBatch(params, function(err, batch) {
                 return callback(err, batch, msg);
             });
         },
         function(batchBuf, msg, callback) {
-            buildBatchList(batchBuf, function(err, batchList) {
+            const params = {
+                batches: batchBuf
+            };
+            buildBatchList(params, function(err, batchList) {
                 return callback(err, batchList, msg);
             });
         },
         function(batchList, msg, callback) {
-            var batchListType = commonProtoPb.collected_batch_list;
-            var buf = batchListType.encode(batchList).finish();
+            let batchListType = commonProtoPb.collected_batch_list;
+            let buf = batchListType.encode(batchList).finish();
             return callback(null, buf, msg);
         }],
         function (err, result, msg) {
             if (err) {
                 return mainCallback(err);
             } else {
-                // calculate the actual collected Mssage byte
-                var collectedMessageBytes = 0;
+                // calculate the actual collected messages byte size
+                let collectedMessageBytes = 0;
                 msg.map(eachMessage => {
                     collectedMessageBytes += eachMessage.messageLength;
                 });
@@ -98,7 +121,7 @@ var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCall
                     if (defalteErr) {
                         return mainCallback(defalteErr);
                     } else {
-                        var payloadSize = compressed.byteLength;
+                        let payloadSize = compressed.byteLength;
                         if (payloadSize > PAYLOAD_BATCH_SIZE) {
                             return mainCallback(`Maximum payload size exceeded: ${payloadSize}`, compressed);
                         } else {
@@ -116,14 +139,12 @@ var buildPayload = function (hostId, sourceId, hostmetaElems, content, parseCall
  * 
  */
 
-function buildType(type, payload, callback) {
-    var verify = type.verify(payload);
+function buildType({type, payload}, callback) {
+    let verify = type.verify(payload);
     if (verify)
         return callback(verify);
 
-    var payloadCreated = type.create(payload);
-
-    return callback(null, payloadCreated);
+    return callback(null, type.create(payload));
 }
 
 /**
@@ -145,32 +166,41 @@ function buildType(type, payload, callback) {
  *  @returns callback
  */
 
-function buildHostmeta(hostId, hostmetaElems, callback) {
-    var hostmetaType = hostMetadataPb.metadata;
-    var hostmeta = {
+function buildHostmeta({hostId, hostmetaElems}, callback) {
+    let hostmetaType = hostMetadataPb.metadata;
+    let hostmeta = {
         elem : hostmetaElems
     };
-    buildType(dictPb.dict, hostmeta, function(err, hostmetaData){
+    const paramsDict = {
+        type: dictPb.dict,
+        payload: hostmeta
+    };
+    
+    buildType(paramsDict, function(err, hostmetaData){
         if (err) {
             return callback(err);
         } else {
-            var meta = {
+            let meta = {
                 hostUuid : hostId,
                 data : hostmetaData,
                 dataChecksum : new Buffer('')
             };
-            var sha = crypto.createHash('sha1');
-            var hashPayload = hostmetaType.encode(meta).finish();
-            var hashValue = sha.update(hashPayload).digest();
+            let sha = crypto.createHash('sha1');
+            let hashPayload = hostmetaType.encode(meta).finish();
+            let hashValue = sha.update(hashPayload).digest();
             
-            var metadataPayload = {
+            let metadataPayload = {
                 hostUuid : hostId,
                 dataChecksum : hashValue,
                 timestamp : Math.floor(Date.now() / 1000),
                 data : hostmetaData
             };
     
-            return buildType(hostmetaType, metadataPayload, callback);
+            const paramsHostmeta = {
+                type: hostmetaType,
+                payload: metadataPayload
+            };
+            return buildType(paramsHostmeta, callback);
         }
     });
 }
@@ -191,47 +221,72 @@ function buildHostmeta(hostId, hostmetaElems, callback) {
  *      applicationId: 'o365'
  *  };
  *  Consult 'collected_message' definition in proto/common_proto.piqi.proto
+ * @param filterJson - JSON parsed object representing key-value pairs which 
+ * should exist in a message. For example, {type: 'Security', category: 'Admin'}.
+ * @param filterRegexp - regexp object filter. If content messages are JSON object
+ * then regexp filter if applied to a stringified message value.
  * @param callback
  * @returns
  */
 
-function buildMessages(content, parseContentFun, callback) {
-    async.reduce(content, [], function(memo, item, asyncCallback) {
-        var messageType = commonProtoPb.collected_message;
-        var messagePayload = parseContentFun(item);
-        buildType(messageType, messagePayload, function(err, buf) {
-            if (err) {
-                return asyncCallback(err);
+function buildMessages({content, parseContentFun, filterJson, filterRegexp}, callback) {
+    const jsonFilteredContent = alLogFilter.filterJson(content, filterJson);
+    const reFilter = alLogFilter.initRegExpFilter(filterRegexp);
+    
+    async.reduce(jsonFilteredContent, [], function(memo, item, asyncCallback) {
+        let messageType = commonProtoPb.collected_message;
+        let messagePayload = parseContentFun(item);
+        if (messagePayload && messagePayload.message) {
+            // Apply RegExp filter
+            const passFilter = reFilter ? reFilter.test(messagePayload.message) : true;
+            if (passFilter) {
+                const paramsMessage = {
+                    type: messageType,
+                    payload: messagePayload
+                };
+                buildType(paramsMessage, function(err, buf) {
+                    if (err) {
+                        return asyncCallback(err);
+                    } else {
+                        buf.messageLength = buf.message.length;
+                        memo.push(buf);
+                        return asyncCallback(err, memo);
+                    }
+                });
             } else {
-                buf.messageLength = buf.message.length;
-                memo.push(buf);
-                return asyncCallback(err, memo);
+                return asyncCallback(null, memo);
             }
-        });
+        } else {
+            return asyncCallback(null, memo);
+        }
     },
     callback);
 }
 
-function buildBatch(sId, metadata, messages, callback) {
-    var batchType = commonProtoPb.collected_batch;
-
-    var batchPayload = {
+function buildBatch({sId, metadata, messages}, callback) {
+    const batchPayload = {
         sourceId: sId,
         metadata: metadata,
         message: messages
     };
 
-    buildType(batchType, batchPayload, callback);
+    const params = {
+        type: commonProtoPb.collected_batch,
+        payload: batchPayload
+    };
+    buildType(params, callback);
 }
 
-function buildBatchList(batches, callback) {
-    var batchListType = commonProtoPb.collected_batch_list;
-
-    var batchListPayload = {
+function buildBatchList({batches}, callback) {
+    const batchListPayload = {
         elem: [batches]
     };
 
-    buildType(batchListType, batchListPayload, callback);
+    const params = {
+        type: commonProtoPb.collected_batch_list,
+        payload: batchListPayload
+    };
+    buildType(params, callback);
 }
 
 

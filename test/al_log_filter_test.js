@@ -43,5 +43,16 @@ describe('Unit Tests', function() {
             return done();
         });
         
+        it('Wrong RegExp filter', function(done) {
+            assert.deepEqual(msgString, alLogFilter.filterRegExp(msgString, '['));
+            return done();
+        });
+        
+        it('Undefined filters', function(done) {
+            assert.deepEqual(msgString, alLogFilter.filterRegExp(msgString, null));
+            assert.deepEqual(msgJson, alLogFilter.filterJson(msgJson));
+            return done();
+        });
+        
     });
 });
