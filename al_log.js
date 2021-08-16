@@ -3,7 +3,7 @@
  * @doc
  *
  * Helper utilities for  Alert Logic log collector.
- * NOT: parameters to all functions are passed as (object, callback)
+ * NOTE: parameters to all functions are passed as (object, callback)
  *
  * @end
  * -----------------------------------------------------------------------------
@@ -70,7 +70,9 @@ var buildPayload = function ({hostId, sourceId, hostmetaElems, content, parseCal
         function(callback) {
             const params = {
                 content: content,
-                parseContentFun: parseCallback
+                parseContentFun: parseCallback,
+                filterJson: filterJson,
+                filterRegexp: filterRegexp
             };
             buildMessages(params, function(err, msg) {
                 return callback(err, msg);

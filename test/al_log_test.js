@@ -67,6 +67,96 @@ describe('Unit Tests', function() {
             });
         });
 
+        it('Sunny case with JSON filter', function(done) {
+            let hostTypeElem = {
+                key: 'host_type',
+                value: {str: 'azure_fun'}
+            };
+            let localHostnameElem = {
+                key: 'local_hostname',
+                value: {str: 'somename'}
+            };
+            let hml = [localHostnameElem, hostTypeElem];
+            let msgs = [
+                {message:'message1', prop: 'value1', filter: 'pass'},
+                {message:'message2', prop: 'value2'},
+                {message:'messagea', prop: 'valuea', filter: 'pass'}
+            ];
+            
+            let parseFun = function(m) {
+                let messagePayload = {
+                  messageTs: 1542138053,
+                  priority: 11,
+                  progName: 'o365webhook',
+                  pid: undefined,
+                  message: JSON.stringify(m),
+                  messageType: 'json/azure.o365',
+                  messageTypeId: 'AzureActiveDirectory',
+                  messageTsUs: undefined
+                };
+                
+                return messagePayload;
+            };
+            let expectedPayload = 'eJzjesDExVmcX1qUnKqbmSIUzcWekV9cAmKK7Nw8722D+HQt112b3JI27E58JnzrtQSDkgWXDBdfTn5yYk48SGleYm6qEJcUR3F+biqIzSXBxQkSjy+pLEgV4pbiTKwqLUqNTyvNk6oSPKrxOpoBCGS5gYQSd76xmWl5alJGfn62kVm1Um5qcXFieqqSFYxlqKSjVFCUXwAUKUvMKQXz0zJzSlKLgCIFicXFSrVW/FnF+Xn6YEv0QOY5iTiC2I7JJZllqS6ZRanJJflFlaTbnYhmdyLZdgMAFp90iA==';
+            const params = {
+                    hostId: 'host-id',
+                    sourceId: 'source-id',
+                    hostmetaElems: hml,
+                    content: msgs,
+                    parseCallback: parseFun,
+                    filterJson: {filter: 'pass'}
+            };
+            alLog.buildPayload(params, function(err, payloadObject){
+                assert.equal(expectedPayload, payloadObject.payload.toString('base64'));
+                return done();
+            });
+        });
+
+        it('Sunny case with regexp filter', function(done) {
+            let hostTypeElem = {
+                key: 'host_type',
+                value: {str: 'azure_fun'}
+            };
+            let localHostnameElem = {
+                key: 'local_hostname',
+                value: {str: 'somename'}
+            };
+            let hml = [localHostnameElem, hostTypeElem];
+            let msgs = [
+                'message1',
+                'message2',
+                'messagea'
+            ];
+            
+            let parseFun = function(m) {
+                let messagePayload = {
+                  messageTs: 1542138053,
+                  priority: 11,
+                  progName: 'o365webhook',
+                  pid: undefined,
+                  message: m,
+                  messageType: 'json/azure.o365',
+                  messageTypeId: 'AzureActiveDirectory',
+                  messageTsUs: undefined
+                };
+                
+                return messagePayload;
+            };
+            let expectedPayload = 'eJzjamHi4izOLy1KTtXNTBGK5mLPyC8uATFFdm6e97ZBfLqW665Nbkkbdic+E771WoJByYJLhosvJz85MScepDQvMTdViEuKozg/NxXE5pLg4gSJx5dUFqQKcUtxJlaVFqXGp5XmSfkIHtV4Hc0ABLLcQEKJO9/YzLQ8NSkjPz/biCM3tbg4MT3V0Io/qzg/Tx+sTQ+kwknEEcR2TC7JLEt1ySxKTS7JL6okzjQjIk0DAFuCVYc=';
+            const params = {
+                    hostId: 'host-id',
+                    sourceId: 'source-id',
+                    hostmetaElems: hml,
+                    content: msgs,
+                    parseCallback: parseFun,
+                    filterRegexp: 'message[0-9]'
+            };
+            alLog.buildPayload(params, function(err, payloadObject){
+                assert.equal(expectedPayload, payloadObject.payload.toString('base64'));
+                return done();
+            });
+        });
+
         it('Too many messages ', function(done) {
             this.timeout(5000);
             var hostTypeElem = {
