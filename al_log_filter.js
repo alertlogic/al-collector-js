@@ -7,16 +7,16 @@
  * @end
  * -----------------------------------------------------------------------------
  */
-const where = require('lodash.where');
+const filterItem = require('lodash.filter');
 
 /**
  *  @function initializes JSON filter
- *  
+ *
  *  @param filter - string or object, for example, '{"a": 1}', {a:1}
- *  
+ *
  *  @return filter - inited Json filter or null if json is incorrect
  */
-var initJsonFilter = function(filter) {
+var initJsonFilter = function (filter) {
     if (typeof filter === 'string') {
         try {
             return JSON.parse(filter);
@@ -38,10 +38,16 @@ var initJsonFilter = function(filter) {
  *  @NOTE: If json filter  is bad then 'messages' is returned unfiltered.
  */
 
-var filterJson = function(messages, filter) {
+var filterJson = function (messages, filter) {
     const filterJ = initJsonFilter(filter);
+    let result = filterItem(messages, filterJ);
     if (filterJ) {
-        return where(messages, filterJ);
+        if (Array.isArray(filterJ)) {
+            filterJ.forEach(function (e) {
+                result = result.concat(filterItem(messages, e));
+            });
+        }
+        return result;
     } else {
         return messages;
     }
@@ -54,7 +60,7 @@ var filterJson = function(messages, filter) {
  *  
  *  @return filter - inited regexp or null if regexp is incorrect
  */
-var initRegExpFilter = function(filter) {
+var initRegExpFilter = function (filter) {
     if (typeof filter === 'string') {
         try {
             return new RegExp(filter);
@@ -76,10 +82,12 @@ var initRegExpFilter = function(filter) {
  *  @NOTE: If regexp filter is bad then 'messages' is returned unfiltered.
  */
 
-var filterRegExp = function(messages, filter) {
+var filterRegExp = function (messages, filter) {
     const re = initRegExpFilter(filter);
     if (re) {
-        return messages.filter(function(m) { return re.test(m); });
+        return messages.filter(function (m) {
+            return re.test(m);
+        });
     } else {
         return messages;
     }
@@ -87,9 +95,9 @@ var filterRegExp = function(messages, filter) {
 
 
 module.exports = {
-    filterJson : filterJson,
-    filterRegExp : filterRegExp,
-    initRegExpFilter : initRegExpFilter,
-    initJsonFilter : initJsonFilter
+    filterJson: filterJson,
+    filterRegExp: filterRegExp,
+    initRegExpFilter: initRegExpFilter,
+    initJsonFilter: initJsonFilter
 };
 
