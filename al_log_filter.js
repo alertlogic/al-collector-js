@@ -7,7 +7,7 @@
  * @end
  * -----------------------------------------------------------------------------
  */
-const filterItem = require('lodash.filter');
+const lodashFilter = require('lodash.filter');
 
 /**
  *  @function initializes JSON filter
@@ -40,12 +40,14 @@ var initJsonFilter = function (filter) {
 
 var filterJson = function (messages, filter) {
     const filterJ = initJsonFilter(filter);
-    let result = filterItem(messages, filterJ);
+    let result = [];
     if (filterJ) {
         if (Array.isArray(filterJ)) {
             filterJ.forEach(function (e) {
-                result = result.concat(filterItem(messages, e));
+                result = result.concat(lodashFilter(messages, e));
             });
+        } else {
+            result = result.concat(lodashFilter(messages, filterJ));
         }
         return result;
     } else {

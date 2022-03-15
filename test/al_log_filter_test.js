@@ -78,7 +78,7 @@ describe('Unit Tests', function() {
                     childTestValue: 'childValue'
                 },
                 text: 'testb'
-            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}]'));
+            }], alLogFilter.filterJson(msgJson, '{"messageB":{"childTestMsg":"childTest"}}'));
             return done();
         });
 
@@ -92,6 +92,55 @@ describe('Unit Tests', function() {
                 },
                 text: 'testb'
             }], alLogFilter.filterJson(msgJson, '{"messageC":{"childTestMsg": "childTest","childTestValue":{"messageC":"c"}}}'));
+            return done();
+        });
+
+        it('Should filter array based on array of object with AND case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }, {
+                messageC: {
+                    childTestMsg: 'childTest',
+                    childTestValue: {
+                        messageC: "c"
+                    }
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageC":{"childTestMsg": "childTest","childTestValue":{"messageC":"c"}}}]'));
+            return done();
+        });
+
+        it('Should filter array based on array of object with OR case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageC":{"childTestMsgT": "childTest","childTestValue":{"messageC":"c"}}}]'));
+            return done();
+        });
+
+        it('Negative case for array based filtering on array of object with OR case(It will behave like AND case)', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }, {
+                messageC: {
+                    childTestMsg: 'childTest',
+                    childTestValue: {
+                        messageC: "c"
+                    }
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageC":{"childTestMsg": "childTest","childTestValue":{"messageC":"c"}}}]'));
             return done();
         });
     });
