@@ -8,6 +8,8 @@
  * -----------------------------------------------------------------------------
  */
 const lodashFilter = require('lodash.filter');
+const lodashRemove = require('lodash.remove');
+const lodashcloneDeep = require('lodash.clonedeep');
 
 /**
  *  @function initializes JSON filter
@@ -40,14 +42,20 @@ var initJsonFilter = function (filter) {
 
 var filterJson = function (messages, filter) {
     const filterJ = initJsonFilter(filter);
-    let result = [];
     if (filterJ) {
+        let result = [];
+        let clonedMsgs = lodashcloneDeep(messages);
         if (Array.isArray(filterJ)) {
             filterJ.forEach(function (e) {
-                result = result.concat(lodashFilter(messages, e));
+                lodashRemove(clonedMsgs, function (t) {
+                    if (lodashFilter([t], e).length) {
+                        result.push(t);
+                        return true;
+                    }
+                });
             });
         } else {
-            result = result.concat(lodashFilter(messages, filterJ));
+            result = result.concat(lodashFilter(clonedMsgs, filterJ));
         }
         return result;
     } else {
