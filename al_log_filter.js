@@ -46,17 +46,17 @@ var filterJson = function (messages, filter) {
         let result = [];
         let clonedMsgs = lodashcloneDeep(messages);
         if (Array.isArray(filterJ)) {
+            // Iterate over filterJson and push filtered items into array
             filterJ.forEach(function (e) {
-                lodashRemove(clonedMsgs, function (t) {
-                    if (lodashFilter([t], e).length) {
-                        result.push(t);
-                        return true;
-                    }
-                });
+                result = result.concat(lodashRemove(clonedMsgs, function (t) {
+                    // filter messages with filterJson element
+                    return lodashFilter([t], e).length;
+                }));
             });
         } else {
             result = result.concat(lodashFilter(clonedMsgs, filterJ));
         }
+        // Return filtered items
         return result;
     } else {
         return messages;

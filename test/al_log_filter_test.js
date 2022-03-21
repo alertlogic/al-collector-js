@@ -48,7 +48,6 @@ describe('Unit Tests', function() {
 
         it('Sunny case ', function(done) {
             assert.deepEqual([{ message1: 1, text: 'test1' }], alLogFilter.filterJson(msgJson, '{"message1":1}'));
-            console.log('Filter Regular Expression', alLogFilter.filterRegExp(msgJson, '\/test1'));
             assert.deepEqual(['message1'], alLogFilter.filterRegExp(msgString, '.*1'));
             assert.deepEqual(['message1', 'message2', 'message3'], alLogFilter.filterRegExp(msgString, '^message.*'));
             return done();
