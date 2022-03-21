@@ -7,16 +7,22 @@
  * @end
  * -----------------------------------------------------------------------------
  */
-const where = require('lodash.where');
+const lodashFilter = require('lodash.filter');
+const lodashRemove = require('lodash.remove');
+const lodashcloneDeep = require('lodash.clonedeep');
 
 /**
  *  @function initializes JSON filter
- *  
- *  @param filter - string or object, for example, '{"a": 1}', {a:1}
- *  
+ *
+ *  @param filter - string or object,
+ *      for example, string '{"a": 1}',
+ *                   object {a:1},
+ *                   deep object '{"a": "firstlevelChild": 1}', '{"a": "firstlevelChild": "secondlevelChild": 2}', '{"a": "...nth levelChild": n},
+ *                   array object '[{"a": 1}, {"b": 2}]',
+ *
  *  @return filter - inited Json filter or null if json is incorrect
  */
-var initJsonFilter = function(filter) {
+var initJsonFilter = function (filter) {
     if (typeof filter === 'string') {
         try {
             return JSON.parse(filter);
@@ -38,10 +44,24 @@ var initJsonFilter = function(filter) {
  *  @NOTE: If json filter  is bad then 'messages' is returned unfiltered.
  */
 
-var filterJson = function(messages, filter) {
+var filterJson = function (messages, filter) {
     const filterJ = initJsonFilter(filter);
     if (filterJ) {
-        return where(messages, filterJ);
+        let result = [];
+        let clonedMsgs = lodashcloneDeep(messages);
+        if (Array.isArray(filterJ)) {
+            // Iterate over filterJson and push filtered items into array
+            filterJ.forEach(function (e) {
+                result = result.concat(lodashRemove(clonedMsgs, function (t) {
+                    // filter messages with filterJson element
+                    return lodashFilter([t], e).length;
+                }));
+            });
+        } else {
+            result = result.concat(lodashFilter(clonedMsgs, filterJ));
+        }
+        // Return filtered items
+        return result;
     } else {
         return messages;
     }
@@ -54,7 +74,7 @@ var filterJson = function(messages, filter) {
  *  
  *  @return filter - inited regexp or null if regexp is incorrect
  */
-var initRegExpFilter = function(filter) {
+var initRegExpFilter = function (filter) {
     if (typeof filter === 'string') {
         try {
             return new RegExp(filter);
@@ -76,10 +96,12 @@ var initRegExpFilter = function(filter) {
  *  @NOTE: If regexp filter is bad then 'messages' is returned unfiltered.
  */
 
-var filterRegExp = function(messages, filter) {
+var filterRegExp = function (messages, filter) {
     const re = initRegExpFilter(filter);
     if (re) {
-        return messages.filter(function(m) { return re.test(m); });
+        return messages.filter(function (m) {
+            return re.test(m);
+        });
     } else {
         return messages;
     }
@@ -87,9 +109,9 @@ var filterRegExp = function(messages, filter) {
 
 
 module.exports = {
-    filterJson : filterJson,
-    filterRegExp : filterRegExp,
-    initRegExpFilter : initRegExpFilter,
-    initJsonFilter : initJsonFilter
+    filterJson: filterJson,
+    filterRegExp: filterRegExp,
+    initRegExpFilter: initRegExpFilter,
+    initJsonFilter: initJsonFilter
 };
 

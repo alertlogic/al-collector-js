@@ -11,15 +11,9 @@
 const assert = require('assert');
 const alLogFilter = require('../al_log_filter');
 
-
 describe('Unit Tests', function() {
     describe('Filter Messages', function() {
-        
-        const msgJson = [
-            { message1: 1, text: 'test1' },
-            { message2: 2, text: 'test12'},
-            { messageA: "a", text: 'testa'},
-        ];
+        let msgJson = [];
         const msgString = [
             'message1',
             'message2',
@@ -27,6 +21,27 @@ describe('Unit Tests', function() {
         ];
         
         before(function(){
+            msgJson = [
+                { message1: 1, text: 'test1' },
+                { message2: 2, text: 'test12'},
+                { messageA: "a", text: 'testa'},
+                { messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                }, text: 'testb'},
+                { messageC: {
+                    childTestMsg: 'childTest',
+                    childTestValue: {
+                        messageC: "c"
+                    }
+                }, text: 'testc'},
+                { messageD: {
+                    childTestMsg: 'childTestD',
+                    childTestValue: {
+                        messageC: "c"
+                    }
+                }, text: 'testd'}
+            ];
         });
         after(function() {
         });
@@ -48,11 +63,97 @@ describe('Unit Tests', function() {
             return done();
         });
         
-        it('Undefined filters', function(done) {
+        it('Undefined filters', function (done) {
             assert.deepEqual(msgString, alLogFilter.filterRegExp(msgString, null));
             assert.deepEqual(msgJson, alLogFilter.filterJson(msgJson));
             return done();
         });
-        
+
+        it('Should filter array based on object child property', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '{"messageB":{"childTestMsg":"childTest"}}'));
+            return done();
+        });
+
+        it('Should filter array based on object child of child property', function (done) {
+            assert.deepEqual([{
+                messageC: {
+                    childTestMsg: 'childTest',
+                    childTestValue: {
+                        messageC: "c"
+                    }
+                },
+                text: 'testc'
+            }], alLogFilter.filterJson(msgJson, '{"messageC":{"childTestMsg": "childTest","childTestValue":{"messageC":"c"}}}'));
+            return done();
+        });
+
+        it('Should filter array based on array of object with AND case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }, {
+                messageC: {
+                    childTestMsg: 'childTest',
+                    childTestValue: {
+                        messageC: "c"
+                    }
+                },
+                text: 'testc'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageC":{"childTestMsg": "childTest","childTestValue":{"messageC":"c"}}}]'));
+            return done();
+        });
+
+        it('Should filter array based on array of object with OR case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageC":{"childTestMsgT": "childTest","childTestValue":{"messageC":"c"}}}]'));
+            return done();
+        });
+
+        it('Two condition match of same object for array based filtering on array of object with OR case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageB":{"childTestValue":"childValue"}}]'));
+            return done();
+        });
+
+        it('three condition match of same object for array based filtering on array of object with OR case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageB":{"childTestValue":"childValue"}}, {"text": "testb"}]'));
+            return done();
+        });
+
+        it('negative case for array based filtering on array of object with OR case', function (done) {
+            assert.deepEqual([{
+                messageB: {
+                    childTestMsg: 'childTest',
+                    childTestValue: 'childValue'
+                },
+                text: 'testb'
+            }], alLogFilter.filterJson(msgJson, '[{"messageB":{"childTestMsg":"childTest"}}, {"messageB":{"childTestValue":"childValue1"}}]'));
+            return done();
+        });
     });
 });
