@@ -14,7 +14,11 @@ const lodashcloneDeep = require('lodash.clonedeep');
 /**
  *  @function initializes JSON filter
  *
- *  @param filter - string or object, for example, '{"a": 1}', {a:1}
+ *  @param filter - string or object,
+ *      for example, string '{"a": 1}',
+ *                   object {a:1},
+ *                   deep object '{"a": "firstlevelChild": 1}', '{"a": "firstlevelChild": "secondlevelChild": 2}', '{"a": "...nth levelChild": n},
+ *                   array object '[{"a": 1}, {"b": 2}]',
  *
  *  @return filter - inited Json filter or null if json is incorrect
  */
