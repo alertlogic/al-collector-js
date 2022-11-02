@@ -12,6 +12,11 @@ stages:
         compute_size: small
         commands:
             - make test
+            - git clone git@algithub.pd.alertlogic.net:alertlogic/al-ps-tools.git
+            - cp coverage/cobertura-coverage.xml al-collector-js.coverage.xml
+            - bash ./al-ps-tools/helpers/collect.sh -c 'al-collector-js.coverage.xml'
+        outputs:
+            file: ./.ps_outputs/*
 
     -
         name: Master Push - Publish
