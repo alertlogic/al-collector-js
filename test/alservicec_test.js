@@ -10,9 +10,11 @@
 
 const fs = require('fs');
 const sinon = require('sinon');
+const assert = require('assert');
 const AimsC = require('../al_servicec').AimsC;
 const AlServiceC = require('../al_servicec').AlServiceC;
 const m_alMock = require('./al_mock');
+const CollectorStatusC = require('../al_servicec').CollectorStatusC;
 var RestServiceClient = require('../al_util').RestServiceClient;
 
 
@@ -76,6 +78,22 @@ describe('Unit Tests', function() {
                     }
                 );
                 done();
+            });
+        });
+
+        it('Verify send Status called with correct parameter', function (done) {
+
+            const fakePost = sinon.stub(AlServiceC.prototype, 'put').callsFake(
+                function fakeFn(path, extraOptions) {
+                    assert.equal(extraOptions.body, m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA);
+                    assert.equal(path, `/statuses/${m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.status_id}/streams/${m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.stream}`);
+                    done();
+                });
+
+            var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            var collectorStatus = new CollectorStatusC(m_alMock.COLLECTOR_STATUS_API, aimsc);
+            collectorStatus.sendStatus(m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.status_id, m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.stream, m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA).then(res => {
+                fakePost.restore();
             });
         });
     });

@@ -178,15 +178,16 @@ class EndpointsC extends AlServiceC {
  */
 class CollectorStatusC extends AlServiceC {
     constructor(apiEndpoint, aimsCreds, retryOptions) {
-        'use strict';
         super(apiEndpoint, 'collectors_status', 'v1', aimsCreds, retryOptions);
     }
-    sendCollectorStatus(accountId, statusId, stream, data) {
+    sendStatus(statusId, stream, data) {
         let payload = {
+            headers : {
+                'Content-Type': 'application/json'
+            },
             body: data
         };
-        'use strict';
-        return this.put(`/${accountId}/statuses/${statusId}/streams/${stream}`, payload);
+        return this.put(`/statuses/${statusId}/streams/${stream}`, payload);
     }
 }
 

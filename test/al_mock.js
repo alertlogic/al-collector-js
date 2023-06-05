@@ -28,6 +28,7 @@ const CID = '12345678';
 
 const AL_API = 'al-api-endpoint.alertlogic.com';
 const INGEST_API = 'ingest-api-endpoint.alertlogic.com';
+const COLLECTOR_STATUS_API = 'collector-status-api-endpoint.alertlogic.com';
 
 const AWS_CHECKIN_URL = '/aws/cwe/checkin/1234567890/us-east-1/test-function';
 
@@ -92,6 +93,21 @@ const AZCOLLECT_CHECKIN_QUERY_COMPRESSED = {
         'Content-Length' : Buffer.byteLength(COMPRESSED_CHECKIN_BODY)
     },
     body : COMPRESSED_CHECKIN_BODY
+};
+
+const SEND_COLLECTOR_STATUS_BODY_DATA = {
+    status: "error",
+    inst_type: "collector",
+    stream: "Audit.Exchange",
+    status_id: "FC561097-E51D-4CB6-AB86-2A90CFFE60C7",
+    timestamp: 1685377308,
+    reported_by: "paws",
+    collection_type: "o365",
+    errorinfo: {
+        code: "500",
+        description: "server error",
+        details: "failed to send logmsgs"
+    }
 };
 
 const AIMS_RESPONSE_200 = {
@@ -170,6 +186,8 @@ module.exports = {
     AIMS_RESPONSE_200: AIMS_RESPONSE_200,
     AZURE_REGISTER_VALUES: AZURE_REGISTER_VALUES,
     AZURE_CHECKIN_VALUES: AZURE_CHECKIN_VALUES,
+    SEND_COLLECTOR_STATUS_BODY_DATA: SEND_COLLECTOR_STATUS_BODY_DATA,
+    COLLECTOR_STATUS_API: COLLECTOR_STATUS_API,
 
     gen_auth_response : gen_auth_response
 };
