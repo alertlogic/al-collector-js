@@ -167,10 +167,34 @@ class EndpointsC extends AlServiceC {
     }
 }
 
+/**
+ * @class
+ * HTTPS client for Alert Logic Collector_status service.
+ *
+ * @constructor
+ * @param {string} apiEndpoint - Alert Logic API hostname.
+ * @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
+ * @param {*} retryOptions
+ */
+class CollectorStatusC extends AlServiceC {
+    constructor(apiEndpoint, aimsCreds, retryOptions) {
+        'use strict';
+        super(apiEndpoint, 'collectors_status', 'v1', aimsCreds, retryOptions);
+    }
+    sendCollectorStatus(accountId, statusId, stream, data) {
+        let payload = {
+            body: data
+        };
+        'use strict';
+        return this.put(`/${accountId}/statuses/${statusId}/streams/${stream}`, payload);
+    }
+}
+
 
 module.exports = {
     AlServiceC: AlServiceC,
     AimsC: AimsC,
-    EndpointsC: EndpointsC
+    EndpointsC: EndpointsC,
+    CollectorStatusC: CollectorStatusC
 };
 
