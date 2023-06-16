@@ -17,6 +17,6 @@ module.exports = {
     AlLog : require('./al_log'),
     Parse: require('./parse'),
     RestServiceClient: require('./al_util').RestServiceClient,
-    CollectorStatusC: require('./al_servicec').CollectorStatusC
+    CollectorStatusC: require('./collector_statusc').CollectorStatusC
 };
 
