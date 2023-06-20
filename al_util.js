@@ -124,6 +124,9 @@ class RestServiceClient {
     deleteRequest(path, extraOptions) {
         return this.request('DELETE', path, extraOptions);
     }
+    put(path, extraOptions) {
+        return this.request('PUT', path, extraOptions);
+    }
     get host() {
         return this._host;
     }
