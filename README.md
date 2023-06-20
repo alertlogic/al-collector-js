@@ -25,7 +25,9 @@ const {
     AzcollectC,
     EndpointsC,
     AlLog,
-    Parse 
+    Parse ,
+    RestServiceClient,
+    CollectorStatusC
 } = require('@alertlogic/al-collector-js');
 ```
 
@@ -89,6 +91,14 @@ const azCollectClient = new AzcollectC(apiEndpoint, aimsCreds, collectorType, se
 
 ```javascript
 const alEndpointsClient = EndpointsC(apiEndpoint, aimsCreds, retryOption);
+```
+## CollectorStatusC
+* @param {string} apiEndpoint - Alert Logic API hostname.
+* @param {Object} aimsCreds - Alert Logic API credentials object, refer to AimsC.
+* @param {*} retryOptions.
+
+```javascript
+const alCollectorStatusClient = CollectorStatusC(apiEndpoint, aimsCreds, retryOption);
 ```
 
 ## AlLog
