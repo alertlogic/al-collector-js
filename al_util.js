@@ -15,6 +15,7 @@ let MAX_CONNS_PER_SERVICE = 128;
 
 /**
  * @default Refer to https://www.npmjs.com/package/retry
+ * set maxRetryTime to 240seconds(4min) to avoid lambda timeout.
  */
 let DEFAULT_RETRY = {
     // Default values
@@ -22,7 +23,8 @@ let DEFAULT_RETRY = {
     factor: 7,
     minTimeout: 300,
     retries: 2,
-    maxTimeout: 10000
+    maxTimeout: 10000,
+    maxRetryTime: 240000 // Maximum time to spend retrying in milliseconds.
 };
 
 /**

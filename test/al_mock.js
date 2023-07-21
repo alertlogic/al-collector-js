@@ -159,6 +159,10 @@ const AIMS_RESPONSE_200 = {
           }
         };
 
+const SERVER_ERROR_500 = {
+    statusCode: 500,
+    message: "Internal Server Error"
+};
 function gen_auth_response() {
     return {
         authentication : {
@@ -188,6 +192,7 @@ module.exports = {
     AZURE_CHECKIN_VALUES: AZURE_CHECKIN_VALUES,
     SEND_COLLECTOR_STATUS_BODY_DATA: SEND_COLLECTOR_STATUS_BODY_DATA,
     COLLECTOR_STATUS_API: COLLECTOR_STATUS_API,
+    SERVER_ERROR_500: SERVER_ERROR_500,
 
     gen_auth_response : gen_auth_response
 };
