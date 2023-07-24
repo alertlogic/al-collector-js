@@ -14,6 +14,7 @@ const nock = require('nock');
 const m_alMock = require('./al_mock');
 const m_alService = require('../al_servicec');
 const EndpointsC = require('../al_servicec').EndpointsC;
+const moment = require('moment');
 
 describe('HTTP request retry tests', function() {
     beforeEach(function(done) {
@@ -199,6 +200,35 @@ describe('HTTP request retry tests', function() {
             })
             .catch(err =>{
                 assert.equal(err.error.customError, customRetryCode);
+                return done();
+            });
+    });
+
+    it('Retry 500 with custom retry config with maxRetryTime', function (done) {
+        const maxRetryTime = 1500;
+        const retryOptions = {
+            retries: 3,
+            factor: 2,
+            minTimeout: 300,
+            maxTimeout: 1000,
+            maxRetryTime: maxRetryTime,
+        };
+        nock('https://' + m_alMock.AL_API)
+            .post('/aims/v1/authenticate')
+            .times(4)
+            .reply(500, m_alMock.SERVER_ERROR_500);
+        var startTime = moment();
+        var aimsc = new m_alService.AimsC(
+            m_alMock.AL_API, m_alMock.AIMS_CREDS, '/tmp', retryOptions);
+        aimsc.authenticate()
+            .catch(err => {
+                assert.equal(err.statusCode, 500);
+                var nowMoment = moment();
+                const elapsedTime = nowMoment.diff(startTime, 'milliseconds');
+                assert.ok(
+                    elapsedTime >= maxRetryTime && elapsedTime <= maxRetryTime + retryOptions.maxTimeout,
+                    'Test case failed: Request did not complete within maxRetryTime.'
+                );
                 return done();
             });
     });

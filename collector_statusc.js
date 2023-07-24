@@ -31,7 +31,9 @@ class CollectorStatusC extends AlServiceC {
             },
             body: data
         };
-        return this.put(`/statuses/${statusId}/streams/${stream}`, payload);
+        // Few collector stream contain `/` which not excepted by collectors_status service. so Encode the stream before making the api call.It will encodes special characters including: , / ? : @ & = + $ # 
+        const encodedStream = encodeURIComponent(stream);
+        return this.put(`/statuses/${statusId}/streams/${encodedStream}`, payload);
     }
 }
 

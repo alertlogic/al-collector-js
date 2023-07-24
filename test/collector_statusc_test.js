@@ -54,6 +54,24 @@ describe('Unit Tests', function () {
             });
         });
 
+        it('it should encode the stream if it contain special char', function (done) {
+            let stream = 'projects/appliance-builds';
+            const encodedStream = encodeURIComponent(stream);
+            fakePut = sinon.stub(AlServiceC.prototype, 'put').callsFake(
+                function fakeFn(path, extraOptions) {
+                    assert.equal(extraOptions.body, m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA);
+                    assert.equal(path, `/statuses/${m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.status_id}/streams/${encodedStream}`);
+                    done();
+                });
+
+            var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
+            var collectorStatus = new CollectorStatusC(m_alMock.COLLECTOR_STATUS_API, aimsc);
+            m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.stream = stream;
+            collectorStatus.sendStatus(m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.status_id, m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA.stream, m_alMock.SEND_COLLECTOR_STATUS_BODY_DATA).then(res => {
+                fakePut.restore();
+            });
+        });
+
         it('If sequence of parameter is not correct then api throw the error', function (done) {
             const error = {
                 "errorinfo": {

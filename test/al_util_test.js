@@ -132,5 +132,51 @@ describe('Unit Tests', function() {
             done();
         });
 
+        it('check it should return server error after retry', function (done) {
+            var restC = new RestServiceClient(m_alMock.AL_API);
+
+            nock('https://' + m_alMock.AL_API, {
+                reqheaders: {
+                    'accept': 'application/json',
+                    'host': m_alMock.AL_API,
+                    'some_header': 'some_value'
+                }
+            })
+                .post(TEST_PATH, TEST_BODY)
+                .reply(500, m_alMock.SERVER_ERROR_500);
+
+            restC.post(TEST_PATH, {
+                headers: { 'some_header': 'some_value' },
+                body: TEST_BODY
+            })
+                .catch(err => {
+                    console.log(`err ${err}`);
+                    done();
+                });
+        });
+
+        it('check it should success if last response is successful after server error 500', function (done) {
+            var restC = new RestServiceClient(m_alMock.AL_API);
+            var restMock = nock('https://' + m_alMock.AL_API, {
+                reqheaders: {
+                    'accept': 'application/json',
+                    'host': m_alMock.AL_API,
+                    'content-type': 'application/json',
+                    'some_header': 'some_value'
+                }
+            })
+                .post(TEST_PATH, TEST_BODY)
+                .reply(500, m_alMock.SERVER_ERROR_500)
+                .post(TEST_PATH, TEST_BODY)
+                .reply(200, m_alMock.AIMS_RESPONSE_200);
+
+            restC.post(TEST_PATH, {
+                headers: { 'some_header': 'some_value' },
+                body: TEST_BODY
+            }).then(res => {
+                assert.ok(restMock.isDone());
+                done();
+            });
+        });
     });
 });
