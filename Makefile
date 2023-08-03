@@ -20,6 +20,7 @@ clean:
 	rm -rf node_modules
 	rm -f package-lock.json
 	rm -f test/report.xml
+	rm -f *.report.xml
 	rm -rf ./coverage/
 
 publish:

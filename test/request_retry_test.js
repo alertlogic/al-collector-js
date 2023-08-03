@@ -80,7 +80,7 @@ describe('HTTP request retry tests', function() {
         var endpointsC = new EndpointsC(m_alMock.AL_API, aimsc, 'cwe');
 
         endpointsC.getEndpoint('azcollect', 'default').then( resp => {
-            assert.equal(resp, undefined);
+            assert.equal(resp, '');
             done();
         });
     });
@@ -135,7 +135,8 @@ describe('HTTP request retry tests', function() {
                 return done();
             })
             .catch(err => {
-                assert.equal(err.statusCode, 401);
+                assert.equal(err.code , 'ERR_BAD_REQUEST');
+                assert.equal(err.response.status , 401);
                 return done();
             });
     });
@@ -148,7 +149,7 @@ describe('HTTP request retry tests', function() {
             .post('/aims/v1/authenticate')
             .reply(201, m_alMock.AIMS_RESPONSE_200);
         var customRetry = function(resp) {
-            if (resp.retryCode === customRetryCode) {
+            if (resp.data.retryCode === customRetryCode) {
                 return true;
             } else {
                 return false;
@@ -178,7 +179,7 @@ describe('HTTP request retry tests', function() {
             .post('/aims/v1/authenticate')
             .reply(201, m_alMock.AIMS_RESPONSE_200);
         var customRetry = function(resp) {
-            if (resp.error.customError === customRetryCode) {
+            if (resp.customError === customRetryCode) {
                 return false;
             } else {
                 return true;
@@ -199,7 +200,7 @@ describe('HTTP request retry tests', function() {
                 return done();
             })
             .catch(err =>{
-                assert.equal(err.error.customError, customRetryCode);
+                assert.equal(err.customError, customRetryCode);
                 return done();
             });
     });
@@ -222,7 +223,7 @@ describe('HTTP request retry tests', function() {
             m_alMock.AL_API, m_alMock.AIMS_CREDS, '/tmp', retryOptions);
         aimsc.authenticate()
             .catch(err => {
-                assert.equal(err.statusCode, 500);
+                assert.equal(err.response.status, 500);
                 var nowMoment = moment();
                 const elapsedTime = nowMoment.diff(startTime, 'milliseconds');
                 assert.ok(

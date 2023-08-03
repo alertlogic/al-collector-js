@@ -7,15 +7,15 @@
  * @end
  * -----------------------------------------------------------------------------
  */
-
-const rp = require('request-promise-native');
+const axios = require('axios');
 const retry = require('retry');
+const http = require('http');
+const https = require('https');
 
 let MAX_CONNS_PER_SERVICE = 128;
 
 /**
  * @default Refer to https://www.npmjs.com/package/retry
- * set maxRetryTime to 180seconds(3min) to avoid lambda timeout.
  */
 let DEFAULT_RETRY = {
     // Default values
@@ -24,18 +24,25 @@ let DEFAULT_RETRY = {
     minTimeout: 300,
     retries: 2,
     maxTimeout: 10000,
-    maxRetryTime: 180000 // Maximum time to spend retrying in milliseconds.
+    maxRetryTime: 180000
 };
 
 /**
- * @function Default retry callback. 
- *  It doesn't retry 2XX, 3XX and 4XX.
+ * @default Refer to httpAgent and httpAgents axios
+ */
+let DEFAULT_HTTP_HTTPS_AGENT_CONFIG = {
+    keepAlive: true,
+    maxSockets: MAX_CONNS_PER_SERVICE,   // Maximum number of sockets to open
+};
+
+
+/**
+ * @function Default retry callback.
+ *  It doesn't retry 2XX, 3XX, and 4XX.
  *  Keeps retrying 5XX HTTP responses and any system level errors
  **/
-var defaultRetryCb = function(err){
-    if (err && 
-        (err.statusCode >= 500 ||
-        (err.error && err.error.errno))) {
+var defaultRetryCb = function (err) {
+    if (err && (err.status >= 500) || (err.response && err.response.status >= 500) || (err.errno)) {
         return true;
     } else {
         return false;
@@ -47,8 +54,7 @@ var defaultRetryCb = function(err){
  * Rest client.
  *
  * @constructor
- * @param {string} endpoint - hostname/address to sent HTTPS
- * requests to.
+ * @param {string} endpoint - hostname/address to sent HTTPS requests to.
  *
  */
 class RestServiceClient {
@@ -56,9 +62,6 @@ class RestServiceClient {
         'use strict';
         this._host = endpoint;
         this._url = 'https://' + endpoint;
-        this._pool = {
-            maxSockets: MAX_CONNS_PER_SERVICE
-        };
         if (retryOptions) {
             this._retryCb = retryOptions.retryCb ? retryOptions.retryCb : defaultRetryCb;
             delete retryOptions.retryCb;
@@ -74,40 +77,43 @@ class RestServiceClient {
         const defaultOptions = {
             method: method,
             url: this._url + path,
-            json: true,
             headers: {},
-            pool: this._pool
+            json: true,
+            httpAgent: new http.Agent(DEFAULT_HTTP_HTTPS_AGENT_CONFIG),
+            httpsAgent: new https.Agent(DEFAULT_HTTP_HTTPS_AGENT_CONFIG)
         };
         const options = Object.assign({}, defaultOptions, extra);
         const defaultHeaders = {
             'Accept': 'application/json'
         };
-        Object.assign(options.headers,
-                      defaultHeaders,
-                      extra.headers ? extra.headers : {});
+        if (!options.data || options.body) {
+            options.data = options.body;
+        }
+        Object.assign(options.headers, defaultHeaders, extra.headers ? extra.headers : {});
         return options;
     }
+
     request(method, path, extraOptions) {
         'use strict';
         const options = this._initRequestOptions(method, path, extraOptions);
         const retryOptions = this._retryOptions;
         var retryCb = this._retryCb;
-        
+
         var operation = retry.operation(retryOptions);
-        
-        return new Promise(function(resolve, reject) {
-            operation.attempt(function(currentAttempt) {
-                rp(options)
-                    .then( resp => {
-                        // We need opertaion.retry here as we want to check if
+
+        return new Promise(function (resolve, reject) {
+            operation.attempt(function (currentAttempt) {
+                axios(options)
+                    .then(resp => {
+                        // We need operation.retry here as we want to check if
                         // the maximum amount of retries has been reached
                         if (retryCb(resp) && operation.retry('retry')) {
                             return;
                         } else {
-                            return resolve(resp);
+                            return resolve(resp.data);
                         }
                     })
-                    .catch( err =>{
+                    .catch(err => {
                         if (retryCb(err) && operation.retry(err)) {
                             return;
                         } else {
@@ -117,21 +123,27 @@ class RestServiceClient {
             });
         });
     }
+
     post(path, extraOptions) {
         return this.request('POST', path, extraOptions);
     }
+
     get(path, extraOptions) {
         return this.request('GET', path, extraOptions);
     }
+
     deleteRequest(path, extraOptions) {
         return this.request('DELETE', path, extraOptions);
     }
+
     put(path, extraOptions) {
         return this.request('PUT', path, extraOptions);
     }
+
     get host() {
         return this._host;
     }
+
     get url() {
         return this._url;
     }
@@ -140,4 +152,3 @@ class RestServiceClient {
 module.exports = {
     RestServiceClient: RestServiceClient
 };
-

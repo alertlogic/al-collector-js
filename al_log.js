@@ -185,7 +185,7 @@ function buildHostmeta({hostId, hostmetaElems}, callback) {
             let meta = {
                 hostUuid : hostId,
                 data : hostmetaData,
-                dataChecksum : new Buffer('')
+                dataChecksum : Buffer.from('')
             };
             let sha = crypto.createHash('sha1');
             let hashPayload = hostmetaType.encode(meta).finish();

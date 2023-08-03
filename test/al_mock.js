@@ -16,7 +16,7 @@ const AIMS_CREDS = {
 
 const AIMS_AUTH = {
     auth : {
-        user: AIMS_CREDS.access_key_id,
+        username: AIMS_CREDS.access_key_id,
         password: AIMS_CREDS.secret_key
     }
 };
