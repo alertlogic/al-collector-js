@@ -34,7 +34,7 @@ class AimsC extends m_alUtil.RestServiceClient {
         super(apiEndpoint, retryOptions);
         this._cid = cid;
         this._aimsAuth = {
-            user: aimsCreds.access_key_id,
+            username: aimsCreds.access_key_id,
             password: aimsCreds.secret_key
         };
         var cache = cacheDir ? cacheDir : DEFAULT_CACHE_DIR;

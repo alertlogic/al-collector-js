@@ -129,10 +129,10 @@ describe('Common parse functions unit tests.', function() {
         done();
     });
     
-    it('Wrong timestamp input', function(done) {
-        var privParseTs = parseWire.__get__('parseTs');
-        assert.deepEqual(privParseTs('foo'), {sec: 1234567, usec: null});
-        
+    it('Wrong timestamp input', function (done) {
+        let parseWire1 = rewire('../parse');
+        var privParseTs = parseWire1.__get__('parseTs');
+        assert.deepEqual(privParseTs('foo'), { sec: 1234567, usec: null });
         done();
     });
     

@@ -147,7 +147,7 @@ describe('Unit Tests', function() {
 
             restC.post(TEST_PATH, {
                 headers: { 'some_header': 'some_value' },
-                body: TEST_BODY
+                data: TEST_BODY
             })
                 .catch(err => {
                     console.log(`err ${err}`);
