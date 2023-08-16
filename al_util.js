@@ -88,6 +88,7 @@ class RestServiceClient {
         };
         if (!options.data || options.body) {
             options.data = options.body;
+            options.body = undefined;
         }
         Object.assign(options.headers, defaultHeaders, extra.headers ? extra.headers : {});
         return options;
