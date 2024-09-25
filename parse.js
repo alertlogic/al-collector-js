@@ -15,6 +15,9 @@
  * For the ISO8601 timestamp, '2018-12-19T08:18:21.1834546Z'
  */
 const ISO8601_MICROSEC_OFFSET = 20;
+const MILLISECONDS_SINCE_EPOCH = 1000000000000;
+const MAX_MILLISECONDS_SINCE_EPOCH = 9999999999999;
+const SECONDS_SINCE_EPOCH = 1000000000;
 
 var getProp = function(path, obj, defaultVal = null) {
     var reduceFun = function(xs, x) {
@@ -31,11 +34,27 @@ var defaultTs = function() {
 };
 
 var parseTs = function (ts) {
-    var milli = typeof ts === 'number' ? ts : Date.parse(ts);
-    if (isNaN(milli)) {
+    // Handle numeric timestamp (seconds or milliseconds)
+    if (typeof ts === 'number') {
+        if (ts >= MILLISECONDS_SINCE_EPOCH && ts <= MAX_MILLISECONDS_SINCE_EPOCH) {
+            return {
+                sec: Math.floor(ts / 1000),
+                usec: (ts % 1000) * 1000 || null
+            };
+        }
+        if (ts >= SECONDS_SINCE_EPOCH && ts <= MILLISECONDS_SINCE_EPOCH) {
+            return {
+                sec: ts,
+                usec: null
+            };
+        }
         return defaultTs();
     } else {
-        var micro = parseTsUsec(ts);
+        const milli = Date.parse(ts);
+        const micro = parseTsUsec(ts);
+        if (isNaN(milli)) {
+            return defaultTs();
+        }
         return {
             sec: Math.floor(milli / 1000),
             usec: micro

@@ -20,7 +20,7 @@ describe('Common parse functions unit tests.', function() {
     var clock;
     
     before(function() {
-        clock = sinon.useFakeTimers({now: 1234567890});
+        clock = sinon.useFakeTimers({now: 1234567890000});
     });
     after(function() {
         clock.restore();
@@ -132,7 +132,7 @@ describe('Common parse functions unit tests.', function() {
     it('Wrong timestamp input', function (done) {
         let parseWire1 = rewire('../parse');
         var privParseTs = parseWire1.__get__('parseTs');
-        assert.deepEqual(privParseTs('foo'), { sec: 1234567, usec: null });
+        assert.deepEqual(privParseTs('foo'), { sec: 1234567890, usec: null });
         done();
     });
 
@@ -140,6 +140,34 @@ describe('Common parse functions unit tests.', function() {
         let parseWire1 = rewire('../parse');
         var privParseTs = parseWire1.__get__('parseTs');
         assert.deepEqual(privParseTs(1721143248000), { sec: 1721143248, usec: null });
+        done();
+    });
+    
+    it('timestamp input in microseconds 1721143248000000', function (done) {
+        let parseWire1 = rewire('../parse');
+        var privParseTs = parseWire1.__get__('parseTs');
+        assert.deepEqual(privParseTs(1721143248000000), { sec: 1234567890, usec: null });
+        done();
+    });
+
+    it('timestamp input in seconds', function (done) {
+        let parseWire1 = rewire('../parse');
+        var privParseTs = parseWire1.__get__('parseTs');
+        assert.deepEqual(privParseTs(1721143248), { sec: 1721143248, usec: null });
+        done();
+    });
+
+    it('timestamp input in the string form example 2018-12-19T08:18:21.1834546Z', function (done) {
+        let parseWire1 = rewire('../parse');
+        var privParseTs = parseWire1.__get__('parseTs');
+        assert.deepEqual(privParseTs('2018-12-19T08:18:21.1834546Z'), { sec: 1545207501, usec: 183454 });
+        done();
+    });
+
+    it('timestamp input in the string form example 2024-09-17T23:56:26.429270+00:00', function (done) {
+        let parseWire1 = rewire('../parse');
+        var privParseTs = parseWire1.__get__('parseTs');
+        assert.deepEqual(privParseTs('2024-09-17T23:56:26.429270+00:00'), { sec: 1726617386, usec: 429270 });
         done();
     });
     

@@ -13,6 +13,7 @@ const http = require('http');
 const https = require('https');
 
 let MAX_CONNS_PER_SERVICE = 128;
+let MAX_FREE_SOCKETS = 10;
 
 /**
  * @default Refer to https://www.npmjs.com/package/retry
@@ -32,9 +33,12 @@ let DEFAULT_RETRY = {
  */
 let DEFAULT_HTTP_HTTPS_AGENT_CONFIG = {
     keepAlive: true,
-    maxSockets: MAX_CONNS_PER_SERVICE,   // Maximum number of sockets to open
+    maxSockets: process.env.MAX_CONNS_PER_SERVICE || MAX_CONNS_PER_SERVICE, // Maximum number of sockets to open
+    maxFreeSockets: process.env.MAX_FREE_SOCKETS || MAX_FREE_SOCKETS   //sets the maximum number of sockets that will be left open in the free state
 };
 
+const httpAgent = new http.Agent(DEFAULT_HTTP_HTTPS_AGENT_CONFIG);
+const httpsAgent = new https.Agent(DEFAULT_HTTP_HTTPS_AGENT_CONFIG);
 
 /**
  * @function Default retry callback.
@@ -79,8 +83,8 @@ class RestServiceClient {
             url: this._url + path,
             headers: {},
             json: true,
-            httpAgent: new http.Agent(DEFAULT_HTTP_HTTPS_AGENT_CONFIG),
-            httpsAgent: new https.Agent(DEFAULT_HTTP_HTTPS_AGENT_CONFIG)
+            httpAgent: httpAgent,
+            httpsAgent: httpsAgent
         };
         const options = Object.assign({}, defaultOptions, extra);
         const defaultHeaders = {
