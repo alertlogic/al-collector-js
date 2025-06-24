@@ -156,6 +156,45 @@ class AzcollectC extends AlServiceC {
                 break;
         }
     }
+
+    /**
+     * Returns the collector configuration containing {pawsCreds, pawsAimsCreds, pawsConfig}.
+     * @param {object} getConfigInput - Required input object; `collectorId` is mandatory.
+     * @returns {object} Collector configuration object.
+     */
+    getCollectorConfig(getConfigInput) {
+        return this.get(`/paws/config/` +
+            `${getConfigInput.collectorId}`, {});
+    }
+    /**
+     * Send the data to azcollect to update the collector configuration.
+     * @param {*} putConfigInput - Required input object; `collectorId` is mandatory and `compressed` is optional.
+     * @param {*} updatedConfig - Json object to be send to azcollect
+     * @returns {*} Response from Azcollect after updating the configuration
+     */
+    putCollectorConfig(putConfigInput, updatedConfig) {
+        const postConfigUrl = `/paws/config/` +
+            `${putConfigInput.collectorId}`;
+        const compressed = putConfigInput.compressed ? putConfigInput.compressed : false;
+
+        if (compressed) {
+            var data = zlib.deflateSync(JSON.stringify(updatedConfig));
+            let payload = {
+                json: false,
+                headers: {
+                    'Content-Encoding': 'deflate',
+                    'Content-Length': Buffer.byteLength(data)
+                },
+                body: data
+            };
+            return this.post(postConfigUrl, payload);
+        } else {
+            let payload = {
+                body: updatedConfig
+            };
+            return this.post(postConfigUrl, payload);
+        }
+    }
 }
 
 module.exports = {
