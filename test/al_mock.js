@@ -164,7 +164,7 @@ const SERVER_ERROR_500 = {
     message: "Internal Server Error"
 };
 
-const COLLETCT_CONFIG = {
+const COLLECT_CONFIG = {
   "pawsCreds": {
     "clientId": "b322e5cc-fdfdfdfd-97445373db77",
     "clientSecret": "Cv=wJJaeNm_TVVsbndbsd_[100",
@@ -216,7 +216,7 @@ module.exports = {
     SEND_COLLECTOR_STATUS_BODY_DATA: SEND_COLLECTOR_STATUS_BODY_DATA,
     COLLECTOR_STATUS_API: COLLECTOR_STATUS_API,
     SERVER_ERROR_500: SERVER_ERROR_500,
-    COLLETCT_CONFIG: COLLETCT_CONFIG,
+    COLLECT_CONFIG: COLLECT_CONFIG,
 
     gen_auth_response : gen_auth_response
 };

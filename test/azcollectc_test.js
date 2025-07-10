@@ -213,10 +213,10 @@ describe('Unit Tests', function() {
         it('AWS update collector config', function (done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'o365');
-            azc.putCollectorConfig({ collectorId: 'C3646C47-GDFGGF-45AA-B61D-6967E245F16G' }, m_alMock.COLLETCT_CONFIG).then(resp => {
+            azc.putCollectorConfig({ collectorId: 'C3646C47-GDFGGF-45AA-B61D-6967E245F16G' }, m_alMock.COLLECT_CONFIG).then(resp => {
                 sinon.assert.calledWith(fakePost,
                     '/paws/config/C3646C47-GDFGGF-45AA-B61D-6967E245F16G',
-                    { body: m_alMock.COLLETCT_CONFIG }
+                    { body: m_alMock.COLLECT_CONFIG }
                 );
                 done();
             });
