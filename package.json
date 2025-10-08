@@ -1,6 +1,6 @@
 {
   "name": "@alertlogic/al-collector-js",
-  "version": "3.0.16",
+  "version": "3.0.17",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "async": "3.2.6",
-    "axios": "^1.11.0",
+    "axios": "^1.12.2",
     "debug": "^4.4.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.filter": "^4.6.0",
