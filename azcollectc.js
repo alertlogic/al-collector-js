@@ -169,16 +169,16 @@ class AzcollectC extends AlServiceC {
     /**
      * Send the data to azcollect to update the collector configuration.
      * @param {*} putConfigInput - Required input object; `collectorId` is mandatory and `compressed` is optional.
-     * @param {*} updatedConfig - Json object to be send to azcollect
+     * @param {*} updatedStateBody - Json object to be send to azcollect
      * @returns {*} Response from Azcollect after updating the configuration
      */
-    putCollectorConfig(putConfigInput, updatedConfig) {
+    updateCollectorStateConfig(putConfigInput, updatedStateBody) {
         const postConfigUrl = `/paws/config/` +
             `${putConfigInput.collectorId}`;
         const compressed = putConfigInput.compressed ? putConfigInput.compressed : false;
 
         if (compressed) {
-            var data = zlib.deflateSync(JSON.stringify(updatedConfig));
+            var data = zlib.deflateSync(JSON.stringify(updatedStateBody));
             let payload = {
                 json: false,
                 headers: {
@@ -187,12 +187,12 @@ class AzcollectC extends AlServiceC {
                 },
                 body: data
             };
-            return this.post(postConfigUrl, payload);
+            return this.put(postConfigUrl, payload);
         } else {
             let payload = {
-                body: updatedConfig
+                body: updatedStateBody
             };
-            return this.post(postConfigUrl, payload);
+            return this.put(postConfigUrl, payload);
         }
     }
 }

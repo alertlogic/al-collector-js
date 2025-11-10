@@ -19,6 +19,7 @@ describe('Unit Tests', function() {
 
     describe('AzcollectC AWS functions', function() {
         var fakePost;
+        var fakePut;
         var fakeDel;
         var fakeAuth;
         var fakeGet;
@@ -32,6 +33,13 @@ describe('Unit Tests', function() {
             });
             
             fakePost = sinon.stub(AzcollectC.prototype, 'post').callsFake(
+                function fakeFn(path, options) {
+                    return new Promise(function(resolve, reject) {
+                        resolve('ok');
+                    });
+            });
+
+            fakePut = sinon.stub(AzcollectC.prototype, 'put').callsFake(
                 function fakeFn(path, options) {
                     return new Promise(function(resolve, reject) {
                         resolve('ok');
@@ -58,6 +66,7 @@ describe('Unit Tests', function() {
             fakeDel.restore();
             fakeAuth.restore();
             fakeGet.restore();
+            fakePut.restore();
             fs.unlink(m_alMock.CACHE_FILENAME, function(err){
                 done();
             });
@@ -213,8 +222,8 @@ describe('Unit Tests', function() {
         it('AWS update collector config', function (done) {
             var aimsc = new AimsC(m_alMock.AL_API, m_alMock.AIMS_CREDS);
             var azc = new AzcollectC(m_alMock.INGEST_ENDPOINT, aimsc, 'aws', 'o365');
-            azc.putCollectorConfig({ collectorId: 'C3646C47-GDFGGF-45AA-B61D-6967E245F16G' }, m_alMock.COLLECT_CONFIG).then(resp => {
-                sinon.assert.calledWith(fakePost,
+            azc.updateCollectorStateConfig({ collectorId: 'C3646C47-GDFGGF-45AA-B61D-6967E245F16G' }, m_alMock.COLLECT_CONFIG).then(resp => {
+                sinon.assert.calledWith(fakePut,
                     '/paws/config/C3646C47-GDFGGF-45AA-B61D-6967E245F16G',
                     { body: m_alMock.COLLECT_CONFIG }
                 );
