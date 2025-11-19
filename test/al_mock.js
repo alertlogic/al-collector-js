@@ -163,6 +163,29 @@ const SERVER_ERROR_500 = {
     statusCode: 500,
     message: "Internal Server Error"
 };
+
+const COLLECT_CONFIG = {
+  "pawsCreds": {
+    "clientId": "b322e5cc-fdfdfdfd-97445373db77",
+    "clientSecret": "Cv=wJJaeNm_TVVsbndbsd_[100",
+    "applicationId": "cdfc67dd-1c13-4487-af02-80dba2236485"
+  },
+  "pawsAimsCreds": {
+    "aimsAccessKey": "fsdfgfdgfg",
+    "aimsSecretKey": "461a11182gfgfgfgfdgfgee0bdf0a9c8b58bf492014e77f39",
+    "customerId": 2,
+    "alertLogicApplicationId": "o365",
+    "collectorId": "C3646C47-GDFGGF-45AA-B61D-6967E245F16G"
+  },
+  "pawsConfig": {
+    "stream": "Audit.AzureActiveDirectory",
+    "since": "2025-06-09T10:20:09.097Z",
+    "until": "2025-06-09T11:20:09.097Z",
+    "pollIntervalSec": 1,
+    "collectorType": "o365"
+  }
+};
+
 function gen_auth_response() {
     return {
         authentication : {
@@ -193,6 +216,7 @@ module.exports = {
     SEND_COLLECTOR_STATUS_BODY_DATA: SEND_COLLECTOR_STATUS_BODY_DATA,
     COLLECTOR_STATUS_API: COLLECTOR_STATUS_API,
     SERVER_ERROR_500: SERVER_ERROR_500,
+    COLLECT_CONFIG: COLLECT_CONFIG,
 
     gen_auth_response : gen_auth_response
 };
