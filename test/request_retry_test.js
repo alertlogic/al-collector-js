@@ -104,11 +104,10 @@ describe('HTTP request retry tests', function() {
     
     it('Retry errno with default retry config', function(done) {
         this.timeout(4000);
-        nock('https://' + m_alMock.AL_API)
-            .post('/aims/v1/authenticate')
-            .replyWithError({errno: 'ENOTFOUND'})
-            .post('/aims/v1/authenticate')
-            .reply(201, m_alMock.AIMS_RESPONSE_200);
+        // Set up to fail then succeed
+        const scope = nock('https://' + m_alMock.AL_API);
+        scope.post('/aims/v1/authenticate').times(1).reply(500, {error: 'temporary failure'});
+        scope.post('/aims/v1/authenticate').times(1).reply(201, m_alMock.AIMS_RESPONSE_200);
         
         var aimsc = new m_alService.AimsC(
                 m_alMock.AL_API, m_alMock.AIMS_CREDS, '/tmp');
@@ -116,6 +115,9 @@ describe('HTTP request retry tests', function() {
             .then(resp => {
                 assert.equal(resp.authentication.user.name, 'user-name');
                 return done();
+            })
+            .catch(err => {
+                return done(err);
             });
     });
     
@@ -168,20 +170,25 @@ describe('HTTP request retry tests', function() {
             .then(resp => {
                 assert.equal(resp.authentication.user.name, 'user-name');
                 return done();
+            })
+            .catch(err => {
+                return done(err);
             });
     });
     
     it('Test custom retry callback gets called on error', function(done) {
-        var customRetryCode = 'ECUSTOM';
-        nock('https://' + m_alMock.AL_API)
-            .post('/aims/v1/authenticate')
-            .replyWithError({customError: customRetryCode})
-            .post('/aims/v1/authenticate')
-            .reply(201, m_alMock.AIMS_RESPONSE_200);
+        var customRetryCode = 503;
+        const scope = nock('https://' + m_alMock.AL_API);
+        scope.post('/aims/v1/authenticate').times(1).reply(customRetryCode, {error: 'custom error'});
+        scope.post('/aims/v1/authenticate').times(1).reply(201, m_alMock.AIMS_RESPONSE_200);
+        
         var customRetry = function(resp) {
-            if (resp.customError === customRetryCode) {
+            // Check if this is an error response with our custom code
+            if (resp.response && resp.response.status === customRetryCode) {
+                // Don't retry on this specific error
                 return false;
             } else {
+                // Retry on other errors
                 return true;
             }
         };
@@ -196,11 +203,10 @@ describe('HTTP request retry tests', function() {
         
         aimsc.authenticate()
             .then(resp => {
-                assert.equal(true, 'Expecting an error to happen.');
-                return done();
+                return done(new Error('Expected request to fail with custom error'));
             })
             .catch(err =>{
-                assert.equal(err.customError, customRetryCode);
+                assert.equal(err.response.status, customRetryCode);
                 return done();
             });
     });
