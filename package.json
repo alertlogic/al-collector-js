@@ -1,6 +1,6 @@
 {
   "name": "@alertlogic/al-collector-js",
-  "version": "3.0.18",
+  "version": "3.0.19",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lint": "jshint --show-non-errors --exclude \"./node_modules/*,./proto/*\" **/*.js *.js",
-    "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura --reporter=text mocha --colors --reporter mocha-jenkins-reporter",
+    "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura --reporter=text mocha --colors",
     "rel": "npm publish --access=public"
   },
   "main": "index.js",
@@ -21,23 +21,22 @@
   ],
   "devDependencies": {
     "jshint": "^2.13.6",
-    "mocha": "^10.8.2",
-    "mocha-jenkins-reporter": "^0.4.8",
-    "nock": "^13.5.6",
+    "mocha": "^11.7.5",
+    "nock": "^14.0.10",
     "nyc": "^17.1.0",
     "rewire": "^9.0.1",
-    "sinon": "^18.0.1",
+    "sinon": "^21.0.1",
     "timekeeper": "^2.3.1"
   },
   "dependencies": {
     "async": "3.2.6",
-    "axios": "^1.12.2",
-    "debug": "^4.4.1",
+    "axios": "^1.13.2",
+    "debug": "^4.4.3",
     "lodash.clonedeep": "^4.5.0",
     "lodash.filter": "^4.6.0",
     "lodash.remove": "^4.7.0",
     "moment": "2.30.1",
-    "protobufjs": "^7.4.0",
+    "protobufjs": "^8.0.0",
     "retry": "0.13.1"
   },
   "author": "Alert Logic Inc."
