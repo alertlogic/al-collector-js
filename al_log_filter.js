@@ -7,9 +7,9 @@
  * @end
  * -----------------------------------------------------------------------------
  */
-const lodashFilter = require('lodash.filter');
-const lodashRemove = require('lodash.remove');
-const lodashcloneDeep = require('lodash.clonedeep');
+const lodashcloneDeep = require('lodash/cloneDeep');
+const lodashFilter = require('lodash/filter');
+const lodashRemove = require('lodash/remove');
 
 /**
  *  @function initializes JSON filter
