@@ -5,7 +5,7 @@
   "description": "Alert Logic Collector Common Library",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alertlogic/al-collector-js#npm"
+    "url": "https://github.com/alertlogic/al-collector-js#npm_vun1"
   },
   "scripts": {
     "lint": "jshint --show-non-errors --exclude \"./node_modules/*,./proto/*\" **/*.js *.js",
