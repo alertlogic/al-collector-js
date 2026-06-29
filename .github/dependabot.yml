@@ -2,7 +2,7 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: "/"
-    target-branch: workflow-test-base
+    target-branch: npm
     schedule:
       interval: daily
     groups:
@@ -20,7 +20,7 @@ updates:
 
   - package-ecosystem: github-actions
     directory: "/"
-    target-branch: workflow-test-base
+    target-branch: npm
     schedule:
       interval: weekly
     groups:
