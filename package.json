@@ -10,6 +10,7 @@
   "scripts": {
     "lint": "jshint --show-non-errors --exclude \"./node_modules/*,./proto/*\" **/*.js *.js",
     "test": "JUNIT_REPORT_PATH=./test/report.xml nyc --reporter=cobertura --reporter=text mocha --colors",
+    "update:overrides": "node scripts/update-overrides.js",
     "rel": "npm publish --access=public"
   },
   "main": "index.js",
