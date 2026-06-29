@@ -78,7 +78,9 @@ jobs:
       - name: Read new version
         if: success() && steps.changes.outputs.changed == 'true'
         id: version
-        run: echo "value=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          version="$(node -e "console.log(require('./package.json').version)")"
+          echo "value=$version" >> "$GITHUB_OUTPUT"
 
       - name: Check for existing update PR
         if: success() && steps.changes.outputs.changed == 'true'
