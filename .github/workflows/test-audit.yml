@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [npm]
+    branches: [workflow-test-base]
   pull_request:
-    branches: [npm, workflow-test-base]
+    branches: [workflow-test-base]
     paths:
       - 'package.json'
       - 'package-lock.json'
