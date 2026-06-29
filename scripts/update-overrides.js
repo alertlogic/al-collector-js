@@ -7,6 +7,12 @@ const { execFileSync } = require('child_process');
 const packageJsonPath = path.join(__dirname, '..', 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const overrides = packageJson.overrides || {};
+const directDependencies = new Set([
+  ...Object.keys(packageJson.dependencies || {}),
+  ...Object.keys(packageJson.devDependencies || {}),
+  ...Object.keys(packageJson.optionalDependencies || {}),
+  ...Object.keys(packageJson.peerDependencies || {})
+]);
 
 function parseJson(raw) {
   try {
@@ -41,16 +47,61 @@ function getAuditReport() {
   }
 }
 
+function getParentPackages(nodes, dependencyName) {
+  if (!Array.isArray(nodes)) {
+    return [];
+  }
+
+  const parents = new Set();
+
+  for (const nodePath of nodes) {
+    if (typeof nodePath !== 'string') {
+      continue;
+    }
+
+    const parts = nodePath
+      .split('/node_modules/')
+      .filter(Boolean)
+      .map((part) => part.replace(/^node_modules\//, ''));
+    if (parts.length < 2) {
+      continue;
+    }
+
+    const child = parts[parts.length - 1];
+    const parent = parts[parts.length - 2];
+
+    if (child === dependencyName && parent) {
+      parents.add(parent);
+    }
+  }
+
+  return Array.from(parents);
+}
+
 let changed = false;
+
+for (const name of Object.keys(overrides)) {
+  const current = overrides[name];
+
+  if (name.startsWith('node_modules/')) {
+    delete overrides[name];
+    changed = true;
+    console.log(`Removed invalid override key ${name}`);
+    continue;
+  }
+
+  if (directDependencies.has(name) && typeof current === 'string') {
+    // npm rejects direct dependency string overrides, but scoped object overrides are valid.
+    delete overrides[name];
+    changed = true;
+    console.log(`Removed direct dependency override ${name}`);
+  }
+}
 
 const auditReport = getAuditReport();
 const vulnerabilities = auditReport && typeof auditReport === 'object' ? (auditReport.vulnerabilities || {}) : {};
 
 for (const [name, vuln] of Object.entries(vulnerabilities)) {
-  if (Object.prototype.hasOwnProperty.call(overrides, name)) {
-    continue;
-  }
-
   try {
     let targetVersion = null;
     const fix = vuln && vuln.fixAvailable;
@@ -63,9 +114,34 @@ for (const [name, vuln] of Object.entries(vulnerabilities)) {
       targetVersion = resolveLatestVersion(name);
     }
 
-    overrides[name] = `^${targetVersion}`;
-    changed = true;
-    console.log(`Added override ${name}: ^${targetVersion}`);
+    if (directDependencies.has(name)) {
+      const parents = getParentPackages(vuln && vuln.nodes, name);
+
+      for (const parent of parents) {
+        const parentOverride = overrides[parent];
+        if (parentOverride && typeof parentOverride !== 'object') {
+          console.warn(`Skipping ${parent}>${name}: parent override is not an object.`);
+          continue;
+        }
+
+        const scoped = parentOverride || {};
+        const nextValue = `^${targetVersion}`;
+        if (scoped[name] !== nextValue) {
+          scoped[name] = nextValue;
+          overrides[parent] = scoped;
+          changed = true;
+          console.log(`Added scoped override ${parent}>${name}: ${nextValue}`);
+        }
+      }
+
+      continue;
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(overrides, name)) {
+      overrides[name] = `^${targetVersion}`;
+      changed = true;
+      console.log(`Added override ${name}: ^${targetVersion}`);
+    }
   } catch (error) {
     console.warn(`Skipping ${name}: ${error.message}`);
   }
