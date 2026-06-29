@@ -58,4 +58,5 @@ jobs:
       - run: npm ci
       - run: npm run update:overrides
       - run: npm install --package-lock-only
+      - run: npm ci
       - run: npm audit --audit-level=high
