@@ -2,7 +2,7 @@ name: Dependency Update
 
 on:
   pull_request:
-    branches: [npm]
+    branches: [npm, workflow-test-base]
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'package.json'
