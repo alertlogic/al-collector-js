@@ -3,6 +3,9 @@ name: Dependency Update
 on:
   push:
     branches: [workflow-test-base]
+  schedule:
+    # Twice weekly: Monday and Thursday at 09:00 UTC
+    - cron: '0 9 * * 1,4'
   workflow_dispatch:
 
 permissions:
