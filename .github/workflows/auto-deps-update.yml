@@ -1,6 +1,8 @@
 name: Dependency Update
 
 on:
+  push:
+    branches: [workflow-test-base]
   workflow_dispatch:
 
 permissions:
