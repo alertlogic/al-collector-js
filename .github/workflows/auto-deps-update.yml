@@ -43,8 +43,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
-      - name: Install current dependencies
-        run: npm ci
+      - name: Install dependencies (npm install to ensure lock sync)
+        run: npm install
 
       - name: Update dependencies
         run: |
@@ -54,6 +54,12 @@ jobs:
       - name: Update npm overrides
         run: |
           npm run update:overrides
+
+      - name: Sync package-lock.json
+        run: npm install --package-lock-only
+
+      - name: Clean install for consistency
+        run: npm ci
 
       - name: Run lint
         run: npm run lint
