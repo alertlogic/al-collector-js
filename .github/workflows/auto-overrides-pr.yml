@@ -36,13 +36,23 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
-      - name: Install current dependencies
-        run: npm ci
+      - name: Install dependencies (npm install to ensure lock sync)
+        run: npm install
 
       - name: Update dependencies
         run: |
           npm update
           npm audit fix --audit-level=high || true
+
+      - name: Update npm overrides
+        run: |
+          npm run update:overrides
+
+      - name: Sync package-lock.json
+        run: npm install --package-lock-only
+
+      - name: Clean install for consistency
+        run: npm ci
 
       - name: Run security audit
         run: npm audit --omit=dev --audit-level=high || true
@@ -50,12 +60,8 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run tests (before overrides)
+      - name: Run tests (before overrides validation)
         run: npm test
-
-      - name: Update npm overrides
-        run: |
-          npm run update:overrides
 
       - name: Check for overrides changes
         if: success()
@@ -67,7 +73,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run tests (after overrides)
+      - name: Run tests (after overrides validation)
         if: success() && steps.overrides_changed.outputs.changed == 'true'
         run: npm test
 
