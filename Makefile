@@ -18,13 +18,15 @@ test: compile
 	
 clean:
 	rm -rf node_modules
-	rm -f package-lock.json
 	rm -f test/report.xml
 	rm -f *.report.xml
 	rm -rf ./coverage/
 
 publish:
 	npm run rel
+
+update-overrides:
+	npm run update:overrides
 
 pb: $(PROTO_DIR)
 	cd $(PROTO_DIR) && make compile
