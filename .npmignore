@@ -1,1 +1,16 @@
 .github/
+
+test/report.xml
+#idea
+.idea/
+nbproject/
+test/ide_test.js
+.env
+
+# Test coverage
+.nyc_output/
+coverage/
+*.coverage.xml
+
+# alps directories
+.ps_outputs
