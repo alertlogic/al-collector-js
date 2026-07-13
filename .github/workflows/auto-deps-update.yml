@@ -1,4 +1,4 @@
-name: Dependency Update
+name: Dependency Updates & Maintenance
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   update-deps:
-    name: Update dependencies and fix vulnerabilities
+    name: Check & Update Dependencies
     runs-on: ubuntu-latest
 
     steps:
@@ -29,20 +29,20 @@ jobs:
           node-version: 24.x
           cache: npm
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: npm install
 
-      - name: Run tests
+      - name: Run full test suite
         run: npm test
 
-      - name: Run lint
+      - name: Run code linting
         run: npm run lint
 
       - name: Audit and fix vulnerabilities
-        run: npm audit fix || true
+        run: npm audit fix
 
       - name: Update npm overrides
-        run: npm run update:overrides || true
+        run: npm run update:overrides
 
       - name: Sync package-lock.json
         run: npm install --package-lock-only
@@ -50,13 +50,21 @@ jobs:
       - name: Clean install for consistency
         run: npm ci
 
-      - name: Check for changes
+      - name: Check for dependency changes
         id: changes
         run: |
-          if git diff --quiet package.json package-lock.json; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
+          # Check if dependencies or devDependencies changed in package.json
+          DEPS_CHANGED=$(git diff package.json | grep -E '^\+.*"dependencies"|^\+.*"devDependencies"|^-.*"dependencies"|^-.*"devDependencies"' | wc -l)
+          
+          # Check if package-lock.json has changes (indicates actual install changes)
+          LOCK_CHANGED=$(git diff --quiet package-lock.json && echo "0" || echo "1")
+          
+          if [ "$DEPS_CHANGED" -gt "0" ] || [ "$LOCK_CHANGED" = "1" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Dependency changes detected"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No dependency changes detected"
           fi
 
       - name: Bump patch version
