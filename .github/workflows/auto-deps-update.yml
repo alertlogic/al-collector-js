@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   update-deps:
-    name: Check & Update Dependencies
+    name: Update dependencies and fix vulnerabilities
     runs-on: ubuntu-latest
 
     steps:
