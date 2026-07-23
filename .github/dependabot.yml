@@ -5,6 +5,7 @@ updates:
     target-branch: npm
     schedule:
       interval: daily
+    versioning-strategy: increase-if-necessary
     groups:
       npm-version-updates:
         applies-to: version-updates
