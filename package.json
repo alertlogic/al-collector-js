@@ -1,6 +1,6 @@
 {
   "name": "@alertlogic/al-collector-js",
-  "version": "3.0.29",
+  "version": "3.0.30",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
@@ -49,7 +49,7 @@
     "uuid": "^14.0.1",
     "@eslint/config-array": "^0.23.5",
     "@eslint/eslintrc": "^3.3.6",
-    "brace-expansion": "^5.0.8",
+    "brace-expansion": "^5.0.9",
     "cli": "^1.0.1",
     "eslint": "^10.8.0",
     "glob": "^13.0.6",
