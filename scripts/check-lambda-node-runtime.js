@@ -1,9 +1,12 @@
 "use strict";
 
 const fs = require("fs");
+const path = require("path");
 const https = require("https");
 
 const RUNTIME_DOCS_URL = "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html";
+const REPO_ROOT = path.resolve(__dirname, "..");
+const STATE_FILE = path.join(REPO_ROOT, ".github", "lambda-runtime.json");
 
 function writeGitHubOutput(key, value) {
   if (!process.env.GITHUB_OUTPUT) {
@@ -18,7 +21,7 @@ function requestWithRedirects(url, maxRedirects = 5) {
     const req = https.get(url, {
       timeout: 15000,
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; al-collector-js-runtime-sync/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; cwe-collector-runtime-sync/1.0)",
         Accept: "text/html,application/xhtml+xml"
       }
     }, (res) => {
@@ -75,16 +78,7 @@ function parseHighestNodeRuntimeMajor(html) {
   while (match !== null) {
     const major = Number(match[1]);
     if (Number.isInteger(major) && major >= 10) {
-      // Check context around the runtime to see if it's marked as "Not scheduled"
-      const matchIndex = match.index;
-      const contextStart = Math.max(0, matchIndex - 200);
-      const contextEnd = Math.min(html.length, matchIndex + 200);
-      const context = html.substring(contextStart, contextEnd);
-
-      // Skip if "Not scheduled" appears in the context
-      if (!context.toLowerCase().includes("not scheduled")) {
-        majors.add(major);
-      }
+      majors.add(major);
     }
     match = regex.exec(html);
   }
@@ -96,21 +90,52 @@ function parseHighestNodeRuntimeMajor(html) {
   return Math.max(...majors);
 }
 
+function readStateMajor() {
+  if (!fs.existsSync(STATE_FILE)) {
+    return null;
+  }
 
+  const raw = fs.readFileSync(STATE_FILE, "utf8");
+  const state = JSON.parse(raw);
+  return Number(state.major);
+}
+
+function writeStateMajor(major) {
+  const payload = {
+    major,
+    runtime: `nodejs${major}.x`,
+    updatedAt: new Date().toISOString()
+  };
+  fs.writeFileSync(STATE_FILE, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+}
 
 async function main() {
   try {
     const html = await fetchHtmlWithRetry(RUNTIME_DOCS_URL);
     const targetMajor = parseHighestNodeRuntimeMajor(html);
     const targetRuntime = `nodejs${targetMajor}.x`;
+    const currentMajor = readStateMajor();
+
+    const shouldUpdate = currentMajor !== targetMajor;
+    let changedFiles = [];
+
+    if (shouldUpdate) {
+      writeStateMajor(targetMajor);
+      changedFiles.push(path.relative(REPO_ROOT, STATE_FILE));
+    }
 
     console.log(JSON.stringify({
+      currentMajor,
       targetMajor,
-      targetRuntime
+      targetRuntime,
+      changed: shouldUpdate,
+      changedFiles
     }, null, 2));
 
+    writeGitHubOutput("changed", shouldUpdate ? "true" : "false");
     writeGitHubOutput("target_major", String(targetMajor));
     writeGitHubOutput("target_runtime", targetRuntime);
+    writeGitHubOutput("changed_files", changedFiles.join(","));
   } catch (error) {
     console.error(`::error::${error.message}`);
     process.exit(1);
