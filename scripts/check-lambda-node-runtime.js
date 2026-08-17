@@ -78,7 +78,16 @@ function parseHighestNodeRuntimeMajor(html) {
   while (match !== null) {
     const major = Number(match[1]);
     if (Number.isInteger(major) && major >= 10) {
-      majors.add(major);
+        // Check context around the runtime to see if it's marked as "Not scheduled"
+      const matchIndex = match.index;
+      const contextStart = Math.max(0, matchIndex - 200);
+      const contextEnd = Math.min(html.length, matchIndex + 200);
+      const context = html.substring(contextStart, contextEnd);
+
+      // Skip if "Not scheduled" appears in the context
+      if (!context.toLowerCase().includes("not scheduled")) {
+        majors.add(major);
+      }
     }
     match = regex.exec(html);
   }
