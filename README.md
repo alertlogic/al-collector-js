@@ -196,3 +196,4 @@ See [debug](https://www.npmjs.com/package/debug) for further details.
 - [Node.js rewire testing tool](https://github.com/jhnns/rewire)
 - [Node.js sinon testing tool](http://sinonjs.org/)
 - [pbjs manual](http://dcode.io/protobuf.js/#pbjs-for-javascript)
+
