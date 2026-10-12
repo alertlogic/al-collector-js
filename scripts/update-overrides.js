@@ -140,6 +140,16 @@ function getParentPackages(nodes, dependencyName) {
   return Array.from(parents);
 }
 
+function hasDirectAdvisory(vuln, dependencyName) {
+  if (!vuln || !Array.isArray(vuln.via)) {
+    return false;
+  }
+
+  return vuln.via.some((entry) => {
+    return entry && typeof entry === 'object' && !Array.isArray(entry) && entry.name === dependencyName;
+  });
+}
+
 let changed = false;
 
 updateDependencyMap('dependency', packageJson.dependencies);
@@ -168,16 +178,12 @@ const vulnerabilities = auditReport && typeof auditReport === 'object' ? (auditR
 
 for (const [name, vuln] of Object.entries(vulnerabilities)) {
   try {
-    let targetVersion = null;
-    const fix = vuln && vuln.fixAvailable;
-
-    if (fix && typeof fix === 'object' && !Array.isArray(fix) && fix.name === name && fix.version) {
-      targetVersion = String(fix.version).trim();
+    if (!hasDirectAdvisory(vuln, name)) {
+      continue;
     }
 
-    if (!targetVersion) {
-      targetVersion = resolveLatestVersion(name);
-    }
+    const targetVersion = resolveLatestVersion(name);
+    const nextValue = `^${targetVersion}`;
 
     if (directDependencies.has(name)) {
       const parents = getParentPackages(vuln && vuln.nodes, name);
@@ -190,7 +196,6 @@ for (const [name, vuln] of Object.entries(vulnerabilities)) {
         }
 
         const scoped = parentOverride || {};
-        const nextValue = `^${targetVersion}`;
         if (scoped[name] !== nextValue) {
           scoped[name] = nextValue;
           overrides[parent] = scoped;
@@ -202,60 +207,61 @@ for (const [name, vuln] of Object.entries(vulnerabilities)) {
       continue;
     }
 
-    if (!Object.prototype.hasOwnProperty.call(overrides, name)) {
-      overrides[name] = `^${targetVersion}`;
+    if (overrides[name] !== nextValue) {
+      overrides[name] = nextValue;
       changed = true;
-      console.log(`Added override ${name}: ^${targetVersion}`);
+      console.log(`Updated override ${name}: ${nextValue}`);
     }
   } catch (error) {
     console.warn(`Skipping ${name}: ${error.message}`);
   }
 }
 
-const names = Object.keys(overrides);
-
-for (const name of names) {
-  const current = overrides[name];
+function bumpOverrideSpec(label, name, current, useAbsoluteLatest) {
   const prefixMatch = typeof current === 'string' ? current.match(/^[^0-9]*/) : null;
 
   if (typeof current !== 'string' || prefixMatch === null) {
-    console.warn(`Skipping ${name}: unsupported override format.`);
-    continue;
+    console.warn(`Skipping ${label}: unsupported override format.`);
+    return current;
   }
 
   try {
-    // Resolve latest version that still satisfies the current range to avoid
-    // accidental breaking major jumps for tooling-sensitive overrides.
-    const raw = execFileSync('npm', ['view', `${name}@${current}`, 'version', '--json'], {
-      encoding: 'utf8'
-    }).trim();
-    let resolved = raw;
-
-    try {
-      resolved = JSON.parse(raw);
-    } catch {
-      // Keep raw text fallback for npm outputs that are not valid JSON.
+    // Top-level advisory pins use the absolute latest so they can leave a
+    // still-vulnerable range. Nested pins are compatibility exceptions and
+    // stay within their declared range.
+    let normalizedLatest;
+    if (useAbsoluteLatest) {
+      normalizedLatest = resolveLatestVersion(name);
+    } else {
+      normalizedLatest = resolveLatestVersionForRange(name, current);
     }
-
-    const latest = Array.isArray(resolved) ? resolved[resolved.length - 1] : resolved;
-    const normalizedLatest = String(latest).trim();
-
-    if (!normalizedLatest || normalizedLatest === 'undefined') {
-      throw new Error(`could not resolve latest version for ${name}@${current}`);
-    }
-
     const next = `${prefixMatch[0]}${normalizedLatest}`;
 
     if (next !== current) {
-      overrides[name] = next;
       changed = true;
-      console.log(`${name}: ${current} -> ${next}`);
-    } else {
-      console.log(`${name}: ${current} (up to date)`);
+      console.log(`${label}: ${current} -> ${next}`);
+      return next;
     }
+
+    console.log(`${label}: ${current} (up to date)`);
+    return current;
   } catch (error) {
-    console.warn(`Skipping ${name}: ${error.message}`);
+    console.warn(`Skipping ${label}: ${error.message}`);
+    return current;
   }
+}
+
+for (const name of Object.keys(overrides)) {
+  const current = overrides[name];
+
+  if (current && typeof current === 'object' && !Array.isArray(current)) {
+    for (const [childName, childSpec] of Object.entries(current)) {
+      current[childName] = bumpOverrideSpec(`${name}>${childName}`, childName, childSpec, false);
+    }
+    continue;
+  }
+
+  overrides[name] = bumpOverrideSpec(name, name, current, true);
 }
 
 if (!changed) {
