@@ -22,8 +22,8 @@
   ],
   "devDependencies": {
     "jshint": "^2.13.6",
-    "mocha": "^11.8.0",
-    "nock": "^14.0.17",
+    "mocha": "^12.0.3",
+    "nock": "^15.0.1",
     "nyc": "^18.0.0",
     "rewire": "^9.0.1",
     "sinon": "^22.1.0",
@@ -35,7 +35,7 @@
     "debug": "^4.4.3",
     "lodash": "^4.18.1",
     "moment": "^2.31.0",
-    "protobufjs": "^8.8.0",
+    "protobufjs": "^8.8.1",
     "retry": "0.13.1"
   },
   "overrides": {
