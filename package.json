@@ -1,6 +1,6 @@
 {
   "name": "@alertlogic/al-collector-js",
-  "version": "3.0.33",
+  "version": "3.0.34",
   "license": "MIT",
   "description": "Alert Logic Collector Common Library",
   "repository": {
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "async": "3.2.6",
-    "axios": "^1.21.0",
+    "axios": "^1.21.1",
     "debug": "^4.4.3",
     "lodash": "^4.18.1",
     "moment": "^2.31.0",
@@ -40,8 +40,8 @@
   },
   "overrides": {
     "follow-redirects": "^1.16.3",
-    "minimatch": "^11.0.5",
-    "glob": "^14.0.4",
+    "minimatch": "^11.0.8",
+    "glob": "^14.0.6",
     "serialize-javascript": "^7.1.4",
     "jshint": {
       "lodash": "^4.18.1",
