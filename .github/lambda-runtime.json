@@ -1,5 +1,5 @@
 {
-  "major": 24,
-  "runtime": "nodejs24.x",
-  "updatedAt": "2026-07-02T00:00:00.000Z"
+  "major": 26,
+  "runtime": "nodejs26.x",
+  "updatedAt": "2026-11-23T02:03:55.049Z"
 }
